@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('roles', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->string('title');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });
 
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
             $table->string('username')->unique();
             $table->string('password');
@@ -38,7 +38,7 @@ return new class extends Migration
         });
 
         Schema::create('customers', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->string('courtesy_title');
             $table->string('full_name');
             $table->integer('age');
@@ -49,7 +49,7 @@ return new class extends Migration
         });
 
         Schema::create('room_types', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('price');
@@ -58,7 +58,7 @@ return new class extends Migration
         });
 
         Schema::create('rooms', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->foreignId('room_type_id')->constrained('room_types')->onDelete('cascade');
             $table->string('label');
             $table->integer('status')->default(0);
@@ -67,7 +67,7 @@ return new class extends Migration
         });
 
         Schema::create('room_tickets', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
             $table->dateTime('check_in')->nullable();
@@ -86,7 +86,7 @@ return new class extends Migration
         });
 
         Schema::create('service_tickets', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
             $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
