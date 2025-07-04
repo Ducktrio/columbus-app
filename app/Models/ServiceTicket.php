@@ -35,9 +35,9 @@ class ServiceTicket extends Model
     }
 
     protected $fillable = [
-        'service_id',
-        'room_id',
         'customer_id',
+        'room_id',
+        'service_id',
         'details',
     ];
 

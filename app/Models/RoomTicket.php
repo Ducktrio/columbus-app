@@ -35,9 +35,8 @@ class RoomTicket extends Model
     }
 
     protected $fillable = [
-        'room_id',
         'customer_id',
-        'details',
+        'room_id',
         'check_in_date',
         'check_out_date',
         'number_of_occupants',
