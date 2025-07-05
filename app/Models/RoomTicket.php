@@ -35,9 +35,8 @@ class RoomTicket extends Model
     }
 
     protected $fillable = [
-        'room_id',
         'customer_id',
-        'details',
+        'room_id',
         'check_in_date',
         'check_out_date',
         'number_of_occupants',
@@ -55,5 +54,35 @@ class RoomTicket extends Model
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');
+    }
+    
+    public function check_in()
+    {
+        $this->check_in_date = now();
+        $this->save();
+
+        if ($this->room) {
+            $this->room->status = 1;
+            $this->room->save();
+        }
+    }
+
+    public function check_out()
+    {
+        $this->check_out_date = now();
+        $this->status = 1;
+        $this->save();
+
+        if ($this->room) {
+            $this->room->status = 2;
+            $this->room->save();
+        }
+
+        ServiceTicket::create([
+            'customer_id' => $this->customer_id,
+            'room_id' => $this->room_id,
+            'service_id' => Service::where('name', 'Cleaning')->first()->id,
+            'details' => 'Room checkout cleaning service',
+        ]);
     }
 }

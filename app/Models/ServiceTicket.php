@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceTicket extends Model
 {
-    protected $table = 'ticket_services';
+    protected $table = 'service_tickets';
     public $incrementing = false;
     protected $keyType = 'string';
 
@@ -14,9 +14,23 @@ class ServiceTicket extends Model
     {
         parent::boot();
 
-        static::creating(function ($ticketService) {
-            if (empty($ticketService->id)) {
-                $ticketService->id = self::generateId();
+        static::creating(function ($serviceTicket) {
+            if (empty($serviceTicket->id)) {
+                $serviceTicket->id = self::generateId();
+            }
+        });
+
+        static::updated(function ($serviceTicket) {
+            if (
+                $serviceTicket->isDirty('status') &&
+                $serviceTicket->status == 2 &&
+                $serviceTicket->service->name === 'Cleaning' &&
+                $serviceTicket->details === 'Room checkout cleaning service'
+            ) {
+                if ($serviceTicket->room) {
+                    $serviceTicket->room->status = 0;
+                    $serviceTicket->room->save();
+                }
             }
         });
     }
@@ -35,9 +49,9 @@ class ServiceTicket extends Model
     }
 
     protected $fillable = [
-        'service_id',
-        'room_id',
         'customer_id',
+        'room_id',
+        'service_id',
         'details',
     ];
 
