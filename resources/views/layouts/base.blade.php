@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Columbus')</title>
@@ -7,7 +7,7 @@
 </head>
 <body>
     {{-- Main Content --}}
-    <main class="container-fluid d-flex min-vh-100">
+    <main class="bg-body-primary p-0 d-flex min-vh-100">
         @yield('content')
     </main>
 
