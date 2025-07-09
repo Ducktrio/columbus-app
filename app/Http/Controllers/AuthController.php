@@ -24,9 +24,9 @@ class AuthController extends Controller
         $credentials = Arr::only($loginRequest->validated(), ['username', 'password']);
         if (Auth::attempt($credentials)) {
             $loginRequest->session()->regenerate();
-            return response()->json(['message' => 'Login successful'], 200);
+            return redirect()->route('index')->with('success', 'You are logged in');
         }
-        return response()->json(['message' => 'Invalid credentials'], 401);
+        return redirect()->route('login')->with("error", "Invalid credentials");
     }
 
     public function get()
@@ -39,6 +39,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return response()->json(['message' => 'Logout successful'], 200);
+        return redirect()->route('index')->with('info', "You have logged out from the system");
     }
 }

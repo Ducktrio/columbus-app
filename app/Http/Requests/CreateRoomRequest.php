@@ -31,4 +31,8 @@ class CreateRoomRequest extends FormRequest
             'room_type_id' => 'required|string|max:255',
         ];
     }
+
+    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator){
+        return redirect()->back()->with("error", $validator->errors());
+    }
 }
