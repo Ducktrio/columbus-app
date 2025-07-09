@@ -24,7 +24,7 @@
 
                 <div class="d-grid">
 
-                    <button type="submit" class="btn btn-primary">Update Room</button>
+                    <button type="submit" class="btn btn-outline-primary">Update Room</button>
 
                 </div>
 
@@ -37,7 +37,7 @@
 
                 <div class="d-grid">
 
-                    <button type="submit" class="btn btn-danger">Delete Room</button>
+                    <button type="submit" class="btn btn-outline-danger">Delete Room</button>
 
                 </div>
 

@@ -46,7 +46,7 @@
                     <form action="{{ route('managers.deleteUser', ['id' => $user->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">Delete User</button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Delete User</button>
                         </form>
                 </div>
             </div>
