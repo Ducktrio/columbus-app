@@ -16,7 +16,8 @@ class AuthController extends Controller
         $data = $createUserRequest->validated();
         $data['password'] = bcrypt($data['password']);
         User::create($data);
-        return response()->json(['message' => 'User registered successfully'], 201);
+        return redirect()->route('managers.listUsers')->with('success', 'User registered successfully');
+        // return response()->json(['message' => 'User registered successfully'], 201); //
     }
 
     public function login(LoginRequest $loginRequest)

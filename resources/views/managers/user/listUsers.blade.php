@@ -34,14 +34,20 @@
                 </div>
 </button>
             <div class="collapse" id="details-{{ $user->id }}">
-            <div class="card card-body">
+                <div class="card card-body">
                     {{ $user->description }}
                     <hr>
                     Created at: {{ $user->created_at }}
-                <br>
+                    <br>
                     Last update: {{ $user->updated_at }} 
                     <hr>
                     ID: {{ $user->id }}
+                    <hr>
+                    <form action="{{ route('managers.deleteUser', ['id' => $user->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">Delete User</button>
+                        </form>
                 </div>
             </div>
 

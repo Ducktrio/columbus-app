@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoomsController;
+use App\Http\Controllers\UsersController;
 use App\Models\Role;
 use App\Models\Room;
 use App\Models\RoomType;
@@ -58,7 +59,7 @@ Route::prefix('managers')->group(function () {
 
 
 
-            return view('managers.manageRooms',
+            return view('managers.room.manageRooms',
                             ['rooms' => $rooms->get()->all(), 'roomTypes' => RoomType::query()->get()->all()]  
                         );
         })->name('managers.manageRooms');       //  managers.manageRooms
@@ -67,15 +68,17 @@ Route::prefix('managers')->group(function () {
             $room = Room::find($id);
             $roomTypes = RoomType::query()->get()->all();
             if ($room) {
-                return view('managers.roomDetail', ['room' => $room, 'roomTypes' => $roomTypes]);
+                return view('managers.room.roomDetail', ['room' => $room, 'roomTypes' => $roomTypes]);
             }
             return redirect()->route('managers.manageRooms')->with('error', 'Room not found');
         })->name('managers.roomDetail');       //  managers.roomDetail
 
         Route::get('/create', function() {
             $types = RoomType::query()->get()->all();
-            return view("managers.createRoom", ["roomTypes" => $types]);
+            return view("managers.room.createRoom", ["roomTypes" => $types]);
         })->name('managers.createRoom');        //  managers.createRoom
+
+        Route::get('/updateStatus/{id}&{status}', [RoomsController::class, 'updateStatus'])->name('managers.updateRoomStatus');        //  managers.updateRoomStatus
 
         Route::post("/create", [RoomsController::class, "create"])->name('managers.createRoom.submit');
 
@@ -88,18 +91,18 @@ Route::prefix('managers')->group(function () {
         
         Route::get('list', function () {
             $users = User::query()->get()->all();
-            return view('managers.listUsers', ["users" => $users]);
+            return view('managers.user.listUsers', ["users" => $users]);
         })->name('managers.listUsers');        //  managers.manageUsers
     
         
         Route::get("create", function() {
             $roles = Role::query()->get()->all();
-            return view('managers.createUser', ['roles' => $roles]);
+            return view('managers.user.createUser', ['roles' => $roles]);
         })->name('managers.createUser');        //  managers.createUser
 
-        Route::post("create", function(Request $req) {
-            return redirect()->route('managers.listUsers')->with("success", "This is a test");
-        })->name('managers.createUser.submit');        //  managers.createUser
+        Route::post("create", [AuthController::class, 'register'])->name('managers.createUser.submit');        //  managers.createUser
+
+        Route::delete('delete/{id}', [UsersController::class, 'delete'])->name('managers.deleteUser');        //  managers.deleteUser
     });
 });
 
@@ -113,3 +116,8 @@ Route::prefix('reception')->group(function() {
 
 
 })->middleware('auth.basic');
+
+
+Route::prefix('rooms')->group(function() {
+
+});

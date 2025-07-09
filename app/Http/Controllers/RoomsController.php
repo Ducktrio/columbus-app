@@ -57,4 +57,18 @@ class RoomsController extends Controller
         return redirect()->route("managers.manageRooms")->with("error", "Room not found");
         // return response()->json(['message' => 'Room not found', 404]);
     }
+
+    public function updateStatus(Request $request, $id, $status)
+    {
+        $room = Room::find($id);
+        if ($room) {
+            if (in_array($status, [0, 1, 2])) {
+                $room->status = $status;
+                $room->save();
+                return redirect()->back()->with("success", "Room status updated successfully");
+            }
+            return redirect()->back()->with("error", "Invalid status value");
+        }
+        return redirect()->back()->with("error", "Room not found");
+    }
 }
