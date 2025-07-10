@@ -12,10 +12,10 @@ class RoomsController extends Controller
     {
         $data = $createRoomRequest->validated();
         Room::create([
-            'label' => $data->label,
-            'room_type_id' => $data->room_type_id,
+            'label' => $data['label'],
+            'room_type_id' => $data['room_type_id']
         ]);
-        return response()->json(['message' => 'Room created successfully'], 201);
+        return redirect()->route("managers.manageRooms")->with("success", "Room [" . $data['label'] . "] is registered");
     }
 
     public function get($id = null)
@@ -45,9 +45,25 @@ class RoomsController extends Controller
         $room = Room::find($id);
         if ($room) {
             $room->delete();
-            return response()->json(['message' => 'Room deleted successfully', 200]);
+            return redirect()->route("managers.manageRooms")->with("success", "Room deleted successfully");
+            // return response()->json(['message' => 'Room deleted successfully', 200]);
         }
-        return response()->json(['message' => 'Room not found', 404]);
+        return redirect()->route("managers.manageRooms")->with("error", "Room not found");
+        // return response()->json(['message' => 'Room not found', 404]);
+    }
+
+    public function updateStatus(Request $request, $id, $status)
+    {
+        $room = Room::find($id);
+        if ($room) {
+            if (in_array($status, [0, 1, 2])) {
+                $room->status = $status;
+                $room->save();
+                return redirect()->back()->with("success", "Room status updated successfully");
+            }
+            return redirect()->back()->with("error", "Invalid status value");
+        }
+        return redirect()->back()->with("error", "Room not found");
     }
 
     public function search($id = null, $label = null, $room_type_id = null)

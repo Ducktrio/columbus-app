@@ -37,11 +37,11 @@ class UsersController extends Controller
     public function delete($id)
     {
         $user = User::find($id);
-        if ($user) {
+        if ($user && $user->role->title !== 'Manager') {
             $user->delete();
-            return response()->json(['message' => "User deleted successfully", 200]);
+            return redirect()->route('managers.listUsers')->with('success', 'User [' . $user->username . '] deleted successfully');
         }
-        return response()->json(['message' => 'User not found', 404]);
+        return redirect()->back()->with('error', 'User cannot be deleted');
     }
 
     public function search($id = null, $role_id = null, $username = null, $description = null)

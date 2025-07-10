@@ -30,8 +30,14 @@ class CreateUserRequest extends FormRequest
         return [
             'role_id' => 'required|exists:roles,id',
             'username' => 'required|string|max:255|unique:users,username',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
             'description' => 'required|string|max:500',
         ];
+    }
+
+    // For validation error
+    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        return redirect()->back()->withErrors($validator)->withInput()->with('error', 'Registration failed due to validation errors');
     }
 }
