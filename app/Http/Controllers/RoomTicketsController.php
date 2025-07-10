@@ -22,7 +22,7 @@ class RoomTicketsController extends Controller
     public function get($id = null)
     {
         if ($id) {
-            $roomTicket = RoomTicket::get($id);
+            $roomTicket = RoomTicket::find($id);
             if ($roomTicket) {
                 return $roomTicket;
             }
@@ -33,7 +33,7 @@ class RoomTicketsController extends Controller
 
     public function update($id, UpdateRoomTicketRequest $updateRoomTicketRequest)
     {
-        $roomTicket = RoomTicket::get($id);
+        $roomTicket = RoomTicket::find($id);
         if ($roomTicket) {
             $data = $updateRoomTicketRequest->validated();
             $roomTicket->customer_id = $data->customer_id ?? $roomTicket->customer_id;
