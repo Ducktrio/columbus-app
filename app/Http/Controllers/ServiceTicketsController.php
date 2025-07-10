@@ -25,7 +25,7 @@ class ServiceTicketsController extends Controller
     public function get($id = null)
     {
         if ($id) {
-            $serviceTicket = ServiceTicket::get($id);
+            $serviceTicket = ServiceTicket::find($id);
             if ($serviceTicket) {
                 return $serviceTicket;
             }
@@ -36,7 +36,7 @@ class ServiceTicketsController extends Controller
 
     public function update($id, UpdateServiceTicketRequest $updateServiceTicketRequest)
     {
-        $serviceTicket = ServiceTicket::get($id);
+        $serviceTicket = ServiceTicket::find($id);
         if ($serviceTicket) {
             $data = $updateServiceTicketRequest->validated();
             $serviceTicket->customer_id = $data->customer_id ?? $serviceTicket->customer_id;
@@ -50,7 +50,7 @@ class ServiceTicketsController extends Controller
 
     public function delete($id)
     {
-        $serviceTicket = ServiceTicket::get($id);
+        $serviceTicket = ServiceTicket::find($id);
         if ($serviceTicket) {
             $serviceTicket->delete();
             return response()->json(['message' => 'Service ticket deleted successfully'], 200);
@@ -60,7 +60,7 @@ class ServiceTicketsController extends Controller
 
     public function take($id)
     {
-        $serviceTicket = ServiceTicket::get($id);
+        $serviceTicket = ServiceTicket::find($id);
         if ($serviceTicket) {
             $serviceTicket->status = 1;
             $serviceTicket->save();
@@ -71,7 +71,7 @@ class ServiceTicketsController extends Controller
 
     public function close($id)
     {
-        $serviceTicket = ServiceTicket::get($id);
+        $serviceTicket = ServiceTicket::find($id);
         if ($serviceTicket) {
             $serviceTicket->status = 2;
             $serviceTicket->save();

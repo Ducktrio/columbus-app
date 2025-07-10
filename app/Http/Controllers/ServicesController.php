@@ -20,7 +20,7 @@ class ServicesController extends Controller
     public function get($id = null)
     {
         if ($id) {
-            $service = Service::get($id);
+            $service = Service::find($id);
             if ($service) {
                 return $service;
             }
@@ -31,7 +31,7 @@ class ServicesController extends Controller
 
     public function update($id, UpdateServiceRequest $updateServiceRequest)
     {
-        $service = Service::get($id);
+        $service = Service::find($id);
         if ($service) {
             $data = $updateServiceRequest->validated();
             $service->name = $data->name ?? $service->name;
@@ -43,7 +43,7 @@ class ServicesController extends Controller
 
     public function delete($id)
     {
-        $service = Service::get($id);
+        $service = Service::find($id);
         if ($service) {
             $service->delete();
             return response()->json(['message' => 'Service deleted successfully'], 200);

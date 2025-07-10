@@ -32,9 +32,7 @@ class RoomsController extends Controller
 
     public function update($id, UpdateRoomRequest $updateRoomRequest)
     {
-        $room = Room::query()->find($id);
-        // $room = Room::get($id); // This line is replaced with the above
-        // to ensure we are using the query builder for better flexibility.
+        $room = Room::find($id);
         if ($room) {
             $data = $updateRoomRequest->validated();
             $room->label = $data['label'] ?? $room->label;
@@ -48,7 +46,7 @@ class RoomsController extends Controller
 
     public function delete($id)
     {
-        $room = Room::query()->find($id);
+        $room = Room::find($id);
         if ($room) {
             $room->delete();
             return redirect()->route("managers.manageRooms")->with("success", "Room deleted successfully");
