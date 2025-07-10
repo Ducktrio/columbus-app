@@ -26,11 +26,6 @@
                 <button type="submit" class="btn btn-primary w-100">Login</button>
             </form>
 
-@if (session('status'))
-    <div class="alert alert-success mt-3">
-        {{ session('status') }}
-    </div>
-@endif
         </div>
     </div>
     </div>
