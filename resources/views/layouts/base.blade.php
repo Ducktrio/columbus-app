@@ -7,9 +7,9 @@
 </head>
 <body>
     {{-- Main Content --}}
-    <main class="bg-body-primary p-0 d-flex min-vh-100">
-        @yield('content')
-    </main>
+    @yield('content')
+
+    @include('components.toast')
 
 
     @vite('resources/js/app.js')
