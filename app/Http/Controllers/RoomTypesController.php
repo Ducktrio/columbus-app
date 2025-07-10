@@ -52,4 +52,26 @@ class RoomTypesController extends Controller
         }
         return response()->json(['message' => 'Room type not found', 404]);
     }
+
+    public function search($id = null, $name = null, $description = null, $price = null)
+    {
+        $query = RoomType::query();
+        if ($id) {
+            $query->where('id', $id);
+        }
+        if ($name) {
+            $query->where('name', $name);
+        }
+        if ($description) {
+            $query->where('description', $description);
+        }
+        if ($price) {
+            $query->where('price', $price);
+        }
+        $search = $query->get();
+        if ($search) {
+            return $search;
+        }
+        return response()->json(['message' => 'Room ticket not found'], 404);
+    }
 }

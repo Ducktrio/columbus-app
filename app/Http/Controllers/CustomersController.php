@@ -58,4 +58,32 @@ class CustomersController extends Controller
         }
         return response()->json(['message' => 'User not found', 404]);
     }
+
+    public function search($id = null, $courtesy_title = null, $full_name = null, $age = null, $contact_info = null, $phone_number = null)
+    {
+        $query = Customer::query();
+        if ($id) {
+            $query->where('id', $id);
+        }
+        if ($courtesy_title) {
+            $query->where('courtesy_title', $courtesy_title);
+        }
+        if ($full_name) {
+            $query->where('full_name', $full_name);
+        }
+        if ($age) {
+            $query->where('age', $age);
+        }
+        if ($contact_info) {
+            $query->where('contact_info', $contact_info);
+        }
+        if ($phone_number) {
+            $query->where('phone_number', $phone_number);
+        }
+        $search = $query->get();
+        if ($search) {
+            return $search;
+        }
+        return response()->json(['message' => 'Room ticket not found'], 404);
+    }
 }

@@ -57,4 +57,48 @@ class ServiceTicketsController extends Controller
         }
         return response()->json(['message' => 'Service ticket not found'], 404);
     }
+
+    public function take($id)
+    {
+        $serviceTicket = ServiceTicket::get($id);
+        if ($serviceTicket) {
+            $serviceTicket->status = 1;
+            $serviceTicket->save();
+            return response()->json(['message' => 'Service ticket taken successfully'], 200);
+        }
+        return response()->json(['message' => 'Service ticket not found'], 404);
+    }
+
+    public function close($id)
+    {
+        $serviceTicket = ServiceTicket::get($id);
+        if ($serviceTicket) {
+            $serviceTicket->status = 2;
+            $serviceTicket->save();
+            return response()->json(['message' => 'Service ticket closed successfully'], 200);
+        }
+        return response()->json(['message' => 'Service ticket not found'], 404);
+    }
+
+    public function search($id = null, $customer_id = null, $room_id = null, $service_id = null, $details = null)
+    {
+        $query = ServiceTicket::query();
+        if ($id) {
+            $query->where('id', $id);
+        }
+        if ($room_id) {
+            $query->where('room_id', $room_id);
+        }
+        if ($service_id) {
+            $query->whereDate('service_id', $service_id);
+        }
+        if ($details) {
+            $query->where('details', $details);
+        }
+        $search = $query->get();
+        if ($search) {
+            return $search;
+        }
+        return response()->json(['message' => 'Service ticket not found'], 404);
+    }
 }

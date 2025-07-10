@@ -50,4 +50,23 @@ class ServicesController extends Controller
         }
         return response()->json(['message' => 'Service not found'], 404);
     }
+
+    public function search($id = null, $name = null, $price = null)
+    {
+        $query = Service::query();
+        if ($id) {
+            $query->where('id', $id);
+        }
+        if ($name) {
+            $query->where('name', $name);
+        }
+        if ($price) {
+            $query->where('price', $price);
+        }
+        $search = $query->get();
+        if ($search) {
+            return $search;
+        }
+        return response()->json(['message' => 'Room ticket not found'], 404);
+    }
 }
