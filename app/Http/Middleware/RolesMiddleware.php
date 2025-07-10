@@ -18,8 +18,11 @@ class RolesMiddleware
     public function handle(Request $request, Closure $next, ...$allowedRoles): Response
     {
         $user = Auth::user();
-        $allowedRoles = array_map('intval', $allowedRoles);
-        if (!$user || !in_array($user->role_id, $allowedRoles)) {
+        if (!$user) {
+            abort(403, 'Unauthorized');
+        }
+        $user_role = Role::find($user->role_id)?->title;
+        if (!in_array($user_role, $allowedRoles)) {
             abort(403, 'Unauthorized');
         }
         return $next($request);
