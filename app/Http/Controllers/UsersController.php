@@ -43,4 +43,26 @@ class UsersController extends Controller
         }
         return response()->json(['message' => 'User not found', 404]);
     }
+
+    public function search($id = null, $role_id = null, $username = null, $description = null)
+    {
+        $query = User::query();
+        if ($id) {
+            $query->where('id', $id);
+        }
+        if ($role_id) {
+            $query->where('role_id', $role_id);
+        }
+        if ($username) {
+            $query->where('username', $username);
+        }
+        if ($description) {
+            $query->where('description', $description);
+        }
+        $search = $query->get();
+        if ($search) {
+            return $search;
+        }
+        return response()->json(['message' => 'Room ticket not found'], 404);
+    }
 }
