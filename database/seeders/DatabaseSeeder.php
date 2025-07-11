@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Customer;
 use App\Models\Role;
+use App\Models\Room;
 use App\Models\RoomType;
 use App\Models\Service;
+use App\Models\ServiceTicket;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -44,7 +47,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Hotel Staff'
         ]);
 
-        Service::create([
+        $service = Service::create([
             'name' => 'Cleaning',
             'price' => 0
         ]);
@@ -61,7 +64,7 @@ class DatabaseSeeder extends Seeder
             'price' => 0
         ]);
 
-        RoomType::create([
+        $type = RoomType::create([
             'name' => 'Single',
             'description' => 'A room for one person, equipped with a single bed.',
             'price' => 500000
@@ -81,5 +84,71 @@ class DatabaseSeeder extends Seeder
             'description' => 'A luxurious room with separate living and sleeping areas, ideal for longer stays or special occasions.',
             'price' => 1000000
         ]);
+
+        $room = Room::create([
+            'label' => 'A1',
+            'room_type_id' => $type->id, 
+            'status' => '0',
+        ]);
+
+        $customers = [
+            [
+            'courtesy_title' => 'Mr.',
+            'full_name' => 'John Doe',
+            'age' => 30,
+            'phone_number' => '1234567890',
+            ],
+            [
+            'courtesy_title' => 'Ms.',
+            'full_name' => 'Jane Smith',
+            'age' => 28,
+            'phone_number' => '0987654321',
+            ],
+            [
+            'courtesy_title' => 'Mrs.',
+            'full_name' => 'Emily Johnson',
+            'age' => 35,
+            'phone_number' => '1112223333',
+            ],
+            [
+            'courtesy_title' => 'Mr.',
+            'full_name' => 'Michael Brown',
+            'age' => 40,
+            'phone_number' => '2223334444',
+            ],
+            [
+            'courtesy_title' => 'Ms.',
+            'full_name' => 'Linda Davis',
+            'age' => 27,
+            'phone_number' => '3334445555',
+            ],
+            [
+            'courtesy_title' => 'Dr.',
+            'full_name' => 'Robert Wilson',
+            'age' => 50,
+            'phone_number' => '4445556666',
+            ],
+            [
+            'courtesy_title' => 'Miss',
+            'full_name' => 'Sophia Martinez',
+            'age' => 22,
+            'phone_number' => '5556667777',
+            ],
+        ];
+
+        $customerModels = [];
+        foreach ($customers as $customerData) {
+            $customerModels[] = Customer::create($customerData);
+        }
+
+        // Create ServiceTickets for each customer
+        foreach ($customerModels as $index => $customer) {
+            ServiceTicket::create([
+            'customer_id' => $customer->id,
+            'room_id' => $room->id,
+            'service_id' => $service->id,
+            'details' => 'Request for room cleaning at ' . (15 + $index) . ':00 PM',
+            ]);
+        }
     }
 }

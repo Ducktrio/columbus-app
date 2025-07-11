@@ -59,6 +59,30 @@
                         Create Room
                 </a>
             </li>
+
+            <hr>
+
+            <!-- Manage Tickets -->
+            <li class="nav-item"> 
+                <a href="{{ route('managers.listTickets') }}" class="nav-link {{ request()->routeIs("managers.listTickets") ?   'active' : 'text-black' }}" aria-current="page">
+                        <i class="bi bi-{{ request()->routeIs('managers.listTickets')? "ticket-detailed-fill" : 'ticket-detailed' }} pe-none me-2">
+                        <use xlink:href="#manageTickets">
+                        </use>
+                        </i>
+                        Manage Tickets
+                </a>
+            </li>
+
+            <!-- Create Ticket -->
+            <li class="nav-item"> 
+                <a href="{{ route('managers.createTicket') }}" class="nav-link {{ request()->routeIs("managers.createTicket") ?   'active' : 'text-black' }}" aria-current="page">
+                        <i class="bi bi-{{ request()->routeIs('managers.createTicket')? "ticket-detailed-fill" : 'ticket-detailed' }} pe-none me-2">
+                        <use xlink:href="#createTicket">
+                        </use> 
+                        </i>
+                        Create Ticket
+                </a>
+            </li>
           
         </ul>
         

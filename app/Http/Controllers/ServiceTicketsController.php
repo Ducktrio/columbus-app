@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\ServiceTicket;
 use App\Http\Requests\CreateServiceTicketRequest;
 use App\Http\Requests\UpdateServiceTicketRequest;
+use Auth;
 use Illuminate\Http\Request;
 
 class ServiceTicketsController extends Controller
@@ -13,12 +14,12 @@ class ServiceTicketsController extends Controller
         $data = $createServiceTicketRequest->validated();
         if ($data) {
             ServiceTicket::create([
-                'customer_id' => $data->customer_id,
-                'room_id'->$data->room_id,
-                'service_id'->$data->service_id,
-                'details'->$data->details,
+                'customer_id' => $data['customer_id'],
+                'room_id' => $data['room_id'],
+                'service_id' => $data['service_id'],
+                'details' => $data['details'],
             ]);
-            return response()->json(['message' => 'Service ticket created successfully'], 201);
+            return redirect()->back()->with('success', 'Service ticket created successfully');
         }
     }
 
@@ -39,13 +40,14 @@ class ServiceTicketsController extends Controller
         $serviceTicket = ServiceTicket::find($id);
         if ($serviceTicket) {
             $data = $updateServiceTicketRequest->validated();
-            $serviceTicket->customer_id = $data->customer_id ?? $serviceTicket->customer_id;
-            $serviceTicket->room_id = $data->room_id ?? $serviceTicket->room_id;
-            $serviceTicket->service_id = $data->service_id ?? $serviceTicket->room_id;
-            $serviceTicket->details = $data->details ?? $serviceTicket->details;
-            return response()->json(['message' => 'Service ticket updated successfully'], 200);
+            $serviceTicket->customer_id = $data['customer_id'] ?? $serviceTicket->customer_id;
+            $serviceTicket->room_id = $data['room_id'] ?? $serviceTicket->room_id;
+            $serviceTicket->service_id = $data['service_id'] ?? $serviceTicket->service_id;
+            $serviceTicket->details = $data['details'] ?? $serviceTicket->details;
+            $serviceTicket->save();
+            return redirect()->back()->with('success', 'Service ticket updated successfully');
         }
-        return response()->json(['message' => 'Service ticket not found'], 404);
+        return redirect()->back()->with('error', 'Service ticket not found');
     }
 
     public function delete($id)
@@ -53,9 +55,13 @@ class ServiceTicketsController extends Controller
         $serviceTicket = ServiceTicket::find($id);
         if ($serviceTicket) {
             $serviceTicket->delete();
-            return response()->json(['message' => 'Service ticket deleted successfully'], 200);
+            if(\Illuminate\Support\Facades\Auth::user()->role->title === 'Manager') {
+                return redirect()->route('managers.listTickets')->with('success', 'Service ticket deleted successfully');
+            }
+            // If the user is not a manager, redirect back
+            return redirect()->back()->with('success', 'Service ticket deleted successfully');
         }
-        return response()->json(['message' => 'Service ticket not found'], 404);
+        return redirect()->back()->with('error', 'Service ticket not found');
     }
 
     public function take($id)
@@ -100,5 +106,16 @@ class ServiceTicketsController extends Controller
             return $search;
         }
         return response()->json(['message' => 'Service ticket not found'], 404);
+    }
+
+    public function updateStatus($id, $status)
+    {
+        $serviceTicket = ServiceTicket::find($id);
+        if ($serviceTicket) {
+            $serviceTicket->status = $status;
+            $serviceTicket->save();
+            return redirect()->back()->with('success', 'Service ticket status updated successfully');
+        }
+        return redirect()->back()->with('error', 'Service ticket not found');
     }
 }
