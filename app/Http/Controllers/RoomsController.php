@@ -78,9 +78,9 @@ class RoomsController extends Controller
         if ($room_type_id) {
             $query->where('room_type_id', $room_type_id);
         }
-        $search = $query->get();
+        $search = $query->paginate(5);
         if ($search) {
-            return $search;
+            return $search; 
         }
         return response()->json(['message' => 'Room ticket not found'], 404);
     }

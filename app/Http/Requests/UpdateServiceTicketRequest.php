@@ -33,4 +33,10 @@ class UpdateServiceTicketRequest extends FormRequest
             'details' => 'nullable|string|max:255',
         ];
     }
+
+    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator) {
+        return redirect()->back()->withErrors($validator)
+            ->withInput()
+            ->with('error', 'Validation failed. Please check your input.');
+    }
 }

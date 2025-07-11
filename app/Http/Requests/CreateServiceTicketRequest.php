@@ -33,4 +33,22 @@ class CreateServiceTicketRequest extends FormRequest
             'details' => 'required|string|max:255',
         ];
     }
+
+    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        $errors = $validator->errors();
+        if ($errors->has('customer_id')) {
+            $this->merge(['customer_id' => null]);
+        }
+        if ($errors->has('room_id')) {
+            $this->merge(['room_id' => null]);
+        }
+        if ($errors->has('service_id')) {
+            $this->merge(['service_id' => null]);
+        }
+        if ($errors->has('details')) {
+            $this->merge(['details' => '']);
+        }
+        return redirect()->back()->with('error', $errors)->withInput();
+    }
 }
