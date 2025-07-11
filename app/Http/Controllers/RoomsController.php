@@ -35,13 +35,9 @@ class RoomsController extends Controller
         $room = Room::find($id);
         if ($room) {
             $data = $updateRoomRequest->validated();
-            $room->label = $data['label'] ?? $room->label;
-            $room->room_type_id = $data['room_type_id'] ?? $room->room_type_id;
-            $room->save();
-            return redirect()->route("managers.roomDetail", ['id' => $room->id])->with("success", "Room updated successfully");
+            $room->label = $data->label ?? $room->label;
+            $room->room_type_id = $data->room_type_id ?? $room->room_type_id;
         }
-        return redirect()->route("managers.manageRooms")->with("error", "Room not found");
-        
     }
 
     public function delete($id)
