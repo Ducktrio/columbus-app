@@ -7,6 +7,7 @@
 
     @php
         $roomSelected = old('room_id');
+
     @endphp
 
     @foreach ($rooms as $room)
@@ -16,11 +17,13 @@
         <label for="room-{{ $room->id }}" class="btn btn-outline-secondary {{ $roomSelected == $room->id ? 'active' : '' }}"
             style="width:100%;">
             <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{ $room->label }} #{{ $room->id }}</h5>
-                <small>{{ $room->roomType->name }}</small>
+                <h5 class="mb-1">Room {{ $room->label }}</h5>
+                <h5>#{{ $room->id }}</h5>
             </div>
-            <p class="mb-1">{{ $room->description }}</p>
-            <small>Status: {{ $room->status }}</small>
+            <div class="d-flex w-100 justify-content-between">
+                <small>Room Type: {{ $room->roomType->name }}</small>
+                <small>Status: {{ ['Available', 'Occupied', 'Unavailable'][$room->status] ?? 'Unknown' }}</small>
+            </div>
         </label>
     @endforeach
 </div>

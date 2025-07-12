@@ -15,17 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    if (Auth::user()) {
-        $user = Auth::user();
-        $routes = [
-            'Receptionist' => 'reception',
-            'Manager' => 'managers',
-            'Staff' => 'staff'
-        ];
-
-        return redirect()->route($routes[$user->role->title]);
-
-    }
+    
     return view('index');
 })->name('index');
 
@@ -41,7 +31,14 @@ Route::prefix("auth")->group(function () {
 
 });
 
-Route::prefix('managers')->group(function () {
+Route::prefix('rooms')->group(function () {
+
+    Route::get('/search', [RoomsController::class, 'search'])->name('rooms.search'); // rooms.search
+});
+
+
+/** Managers Route */
+Route::prefix('managers')->middleware('role:Manager')->group(function () {
 
     Route::get("/", function () {
         return redirect()->route('managers.listUsers');
@@ -179,9 +176,9 @@ Route::prefix('managers')->group(function () {
         Route::delete('delete/{id}', [ServiceTicketsController::class, 'delete'])->name('managers.deleteTicket');        //  managers.deleteUser
 
     });
-});
+}); // managers
 
-
+/** Receiption Route */
 Route::prefix('reception')->group(function () {
 
     Route::get('/', function () {
@@ -190,10 +187,28 @@ Route::prefix('reception')->group(function () {
     })->name('reception');          //  receiptionist
 
 
-})->middleware('auth.basic');
+})->middleware('role:Receptionist'); // receiptionist
 
 
-Route::prefix('rooms')->group(function () {
+/** Staff Route */
+Route::prefix('staff')->group(function () {
 
-    Route::get('/search', [RoomsController::class, 'search'])->name('rooms.search'); // rooms.search
-});
+    Route::get('/', function () {
+        return redirect()->route('staff.dashboard');
+    })->name('staff');       // staff
+
+    Route::get('/dashboard', function (string $service_id = null) {
+        
+        $tickets = ServiceTicket::query();
+
+        if($service_id) {
+            $tickets->where('service_id', $service_id);
+        }
+
+        $tickets = $tickets->paginate(5)->sortByDesc('created_at');
+
+
+        return view('staff.dashboard', ["tickets" => $tickets]);
+    })->name('staff.dashboard');          //  staff.dashboard
+
+})->middleware('role:Staff');
