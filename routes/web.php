@@ -15,17 +15,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+
     if (Auth::user()) {
         $user = Auth::user();
         $routes = [
-            'Receptionist' => 'reception',
             'Manager' => 'managers',
-            'Staff' => 'staff'
+            'Receptionist' => 'reception',
+            'Staff' => 'staff.dashboard',
         ];
-
-        return redirect()->route($routes[$user->role->title]);
-
+        if (array_key_exists($user->role->title, $routes)) {
+            return redirect()->route($routes[$user->role->title]);
+        }
     }
+
     return view('index');
 })->name('index');
 
@@ -41,7 +43,14 @@ Route::prefix("auth")->group(function () {
 
 });
 
-Route::prefix('managers')->group(function () {
+Route::prefix('rooms')->group(function () {
+
+    Route::get('/search', [RoomsController::class, 'search'])->name('rooms.search'); // rooms.search
+});
+
+
+/** Managers Route */
+Route::prefix('managers')->middleware('role:Manager')->group(function () {
 
     Route::get("/", function () {
         return redirect()->route('managers.listUsers');
@@ -179,9 +188,9 @@ Route::prefix('managers')->group(function () {
         Route::delete('delete/{id}', [ServiceTicketsController::class, 'delete'])->name('managers.deleteTicket');        //  managers.deleteUser
 
     });
-});
+}); // managers
 
-
+/** Receiption Route */
 Route::prefix('reception')->group(function () {
 
     Route::get('/', function () {
@@ -190,10 +199,52 @@ Route::prefix('reception')->group(function () {
     })->name('reception');          //  receiptionist
 
 
-})->middleware('auth.basic');
+})->middleware('role:Receptionist'); // receiptionist
 
 
-Route::prefix('rooms')->group(function () {
+/** Staff Route */
+Route::prefix('staff')->group(function () {
 
-    Route::get('/search', [RoomsController::class, 'search'])->name('rooms.search'); // rooms.search
-});
+    Route::get('/', function () {
+        return redirect()->route('staff.dashboard');
+    })->name('staff');       // staff
+
+   
+
+    Route::get('/dashboard', function (Request $request) {
+
+        $service_id = $request->query('service_id');
+        $status = $request->query('status');
+
+        $tickets = ServiceTicket::query();
+
+        if ($service_id) {
+            $tickets->where('service_id', $service_id);
+        }
+
+        if (isset($status)) {
+            $tickets->where('status', $status);
+        }
+
+        $tickets = $tickets->orderBy('status')->orderByDesc('created_at')->paginate(6);
+
+        return view('staff.dashboard', ["tickets" => $tickets]);
+    })->name('staff.dashboard');          //  staff.dashboard
+
+    Route::get('/ticket/detail/{id}', function (string $id) {
+        $ticket = ServiceTicket::find($id);
+        if ($ticket) {
+            return view('staff.ticketDetail', ['ticket' => $ticket]);
+        }
+        return redirect()->route('staff.dashboard')->with('error', 'Ticket not found');
+    })->name('staff.ticketDetail');          //  staff.ticketDetail
+
+})->middleware('role:Staff');
+
+
+Route::prefix('ticket')->group(function () {
+
+    Route::get('take/{id}', [ServiceTicketsController::class, 'take'])->name('ticket.take'); // ticket.take
+    Route::get('close/{id}', [ServiceTicketsController::class, 'close'])->name('ticket.close'); // ticket.close
+
+})->middleware("role:Staff,Manager,Receiptionist"); // ticket

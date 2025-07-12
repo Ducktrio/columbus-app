@@ -19,11 +19,11 @@ class RolesMiddleware
     {
         $user = Auth::user();
         if (!$user) {
-            abort(403, 'Unauthorized');
+            return redirect()->route('index')->with('error', 'You must be logged in to access this page.');
         }
         $user_role = Role::find($user->role_id)?->title;
         if (!in_array($user_role, $allowedRoles)) {
-            abort(403, 'Unauthorized');
+            return redirect()->route('index')->with('error', 'You do not have permission to access this page.');
         }
         return $next($request);
     }
