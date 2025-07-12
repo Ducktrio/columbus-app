@@ -15,7 +15,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    
+
+    if (Auth::user()) {
+        $user = Auth::user();
+        $routes = [
+            'Manager' => 'managers',
+            'Receptionist' => 'reception',
+            'Staff' => 'staff.dashboard',
+        ];
+        if (array_key_exists($user->role->title, $routes)) {
+            return redirect()->route($routes[$user->role->title]);
+        }
+    }
+
     return view('index');
 })->name('index');
 
@@ -197,18 +209,42 @@ Route::prefix('staff')->group(function () {
         return redirect()->route('staff.dashboard');
     })->name('staff');       // staff
 
-    Route::get('/dashboard', function (string $service_id = null) {
-        
+   
+
+    Route::get('/dashboard', function (Request $request) {
+
+        $service_id = $request->query('service_id');
+        $status = $request->query('status');
+
         $tickets = ServiceTicket::query();
 
-        if($service_id) {
+        if ($service_id) {
             $tickets->where('service_id', $service_id);
         }
 
-        $tickets = $tickets->paginate(5)->sortByDesc('created_at');
+        if (isset($status)) {
+            $tickets->where('status', $status);
+        }
 
+        $tickets = $tickets->orderBy('status')->orderByDesc('created_at')->paginate(6);
 
         return view('staff.dashboard', ["tickets" => $tickets]);
     })->name('staff.dashboard');          //  staff.dashboard
 
+    Route::get('/ticket/detail/{id}', function (string $id) {
+        $ticket = ServiceTicket::find($id);
+        if ($ticket) {
+            return view('staff.ticketDetail', ['ticket' => $ticket]);
+        }
+        return redirect()->route('staff.dashboard')->with('error', 'Ticket not found');
+    })->name('staff.ticketDetail');          //  staff.ticketDetail
+
 })->middleware('role:Staff');
+
+
+Route::prefix('ticket')->group(function () {
+
+    Route::get('take/{id}', [ServiceTicketsController::class, 'take'])->name('ticket.take'); // ticket.take
+    Route::get('close/{id}', [ServiceTicketsController::class, 'close'])->name('ticket.close'); // ticket.close
+
+})->middleware("role:Staff,Manager,Receiptionist"); // ticket

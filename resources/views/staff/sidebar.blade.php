@@ -9,17 +9,26 @@
     <ul class="nav nav-pills flex-column mb-auto">
 
         <!-- Tickets -->
-        <li class="nav-item">
-            <a href="{{ route('staff.dashboard') }}"
-                class="nav-link {{ request()->routeIs("staff.dashboard") ? 'active' : 'text-black' }}"
-                aria-current="page">
-                <i class="bi bi-ticket pe-none me-2">
-                    <use xlink:href="#tickets">
-                    </use>
-                </i>
-                Tickets
-            </a>
-        </li>
+        @php
+            $services = \App\Models\Service::all();
+            $currentServiceId = request()->query('service_id');
+        @endphp
+
+        @foreach($services as $service)
+            <li class="nav-item">
+                <a href="{{ route('staff.dashboard') }}?service_id={{ $service->id }}"
+                    class="nav-link {{ $currentServiceId == $service->id ? 'active' : 'text-black' }}">
+                    <i class="bi bi-ticket pe-none me-2"></i>
+                    {{ $service->name }}
+
+                    @if($service->serviceTickets()->where('status', 0)->count() > 0)
+                    <span class="badge text-bg-danger rounded-pill float-end">
+                        {{ $service->serviceTickets()->where('status', 0)->count() }}
+                    </span>
+                    @endif
+                </a>
+            </li>
+        @endforeach
 
         
     </ul>
