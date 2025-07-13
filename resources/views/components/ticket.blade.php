@@ -9,7 +9,7 @@
     <div class="card-body">
 
         <div class="d-flex justify-content-between align-items-center mb-2">
-            <h4 class="mb-2"># {{ $ticket->id }}</h4>
+            <h4 class="mb-2 fs-5"># {{ $ticket->id }}</h4>
 
             @php
                 $statusMap = [
@@ -21,21 +21,23 @@
             @endphp
 
 
-            <span class="badge text-bg-{{ $status['class'] }} fs-5">
-                {{ $status['label'] }}
-            </span>
         </div>
+        <span class="badge mb-2 text-bg-{{ $status['class'] }} fs-5">
+            {{ $status['label'] }}
+        </span>
 
         <br>
 
         <div class="d-flex justify-content-between align-items-center mt-2">
-            <small><i class="bi bi-pen-fill"></i> {{ $ticket->created_at->diffForHumans() }}</small>
-            @if($ticket->status === 1)
-            <small class="text-muted">Last updated {{ $ticket->updated_at->diffForHumans() }}</small>
+            @if($ticket->status === 0)
+                <small><i class="bi bi-pen-fill"></i> {{ $ticket->created_at->diffForHumans() }}</small>
+
+            @elseif($ticket->status === 1)
+                <small class="text-muted">Last updated {{ $ticket->updated_at->diffForHumans() }}</small>
             @elseif($ticket->status === 2)
-                <small class="text-muted">Resolved at {{ $ticket->updated_at }}</small>
+                <small class="text-muted"><i class="bi bi-check-all"></i> Resolved at {{ $ticket->updated_at }}</small>
             @endif
-            </div>
+        </div>
     </div>
 
 
