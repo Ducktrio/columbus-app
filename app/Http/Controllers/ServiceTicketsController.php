@@ -21,6 +21,7 @@ class ServiceTicketsController extends Controller
             ]);
             return redirect()->back()->with('success', 'Service ticket created successfully');
         }
+        return redirect()->back()->with('error', 'Failed to create service ticket');
     }
 
     public function get($id = null)

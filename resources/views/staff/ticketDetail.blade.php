@@ -71,7 +71,7 @@
                         @elseif($ticket->status === 1)
 
                             @php
-                                $canResolve = now()->diffInMinutes($ticket->updated_at) >= 5;
+                                $canResolve = $ticket->updated_at->lte(now()) && $ticket->updated_at->diffInMinutes(now()) >= 5;
                             @endphp
 
                             <a href="{{ route('ticket.close', ['id' => $ticket->id]) }}" class="btn btn-outline-success py-4"

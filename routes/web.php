@@ -60,13 +60,19 @@ Route::prefix('managers')->middleware('role:Manager')->group(function () {
 
         Route::get('/', function (Request $request) {
             $rooms = Room::query();
+            $roomType = RoomType::query()->get()->first();
 
             if ($request->filled('status')) {
                 $rooms->where('status', $request->query('status'));
+            } else {
+                return redirect()->route('managers.manageRooms', array_merge($request->query(), ['status' => '0']));
             }
 
             if ($request->filled('room_type')) {
                 $rooms->where('room_type_id', $request->query('room_type'));
+            }
+            else {
+                return redirect()->route('managers.manageRooms', array_merge($request->query(), ['room_type' => $roomType->id]));
             }
 
 
@@ -122,6 +128,7 @@ Route::prefix('managers')->middleware('role:Manager')->group(function () {
 
         Route::get('list', function (Request $request) {
             $tickets = \App\Models\ServiceTicket::query();
+
             $status = $request->query('status');
 
             if ($status === '0') {
@@ -130,8 +137,10 @@ Route::prefix('managers')->middleware('role:Manager')->group(function () {
                 $tickets->where('status', 1);
             } elseif ($status === '2') {
                 $tickets->where('status', 2);
+            } else {
+                return redirect()->route('managers.listTickets', array_merge($request->query(),['status' => '0']));
             }
-            $tickets = $tickets->paginate(5);
+            $tickets = $tickets->paginate(6);
 
             return view('managers.ticket.listTickets', ["tickets" => $tickets]);
         })->name('managers.listTickets'); // managers.listTickets
@@ -158,7 +167,7 @@ Route::prefix('managers')->middleware('role:Manager')->group(function () {
             }
 
             $rooms = $rooms->paginate(5);
-            $customers = $customers->paginate(5);
+            $customers = $customers->paginate(4);
 
             if ($request->ajax()) {
                 return response()->json([
@@ -224,6 +233,8 @@ Route::prefix('staff')->group(function () {
 
         if (isset($status)) {
             $tickets->where('status', $status);
+        } else {
+            return redirect()->route('staff.dashboard', array_merge($request->query(), ['status' => '0']));
         }
 
         $tickets = $tickets->orderBy('status')->orderByDesc('created_at')->paginate(6);

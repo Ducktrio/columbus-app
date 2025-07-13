@@ -14,7 +14,7 @@
         <input type="radio" class="btn-check room-item" name="room_id" id="room-{{ $room->id }}" value="{{ $room->id }}"
             autocomplete="off" {{ $roomSelected == $room->id ? 'checked' : '' }} data-label="{{ strtolower($room->label) }}"
             data-description="{{ strtolower($room->description) }}">
-        <label for="room-{{ $room->id }}" class="btn btn-outline-secondary {{ $roomSelected == $room->id ? 'active' : '' }}"
+        <label for="room-{{ $room->id }}" class="btn btn-outline-secondary"
             style="width:100%;">
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">Room {{ $room->label }}</h5>

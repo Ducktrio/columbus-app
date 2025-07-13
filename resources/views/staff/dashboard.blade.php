@@ -5,24 +5,21 @@
     <div class="row mb-5">
         <ul class="nav nav-tabs">
             @php
-            $query = request()->query();
+                $query = request()->query();
             @endphp
+
             <li class="nav-item">
-            <a class="nav-link {{ request('status') ? '' : 'active' }}"
-               aria-current="page"
-               href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => null])) }}">All</a>
+                <a class="nav-link {{ request('status') === '0' ? 'active' : '' }}"
+                    href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '0'])) }}">Open</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link {{ request('status') === '0' ? 'active' : '' }}"
-               href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '0'])) }}">Open</a>
+                <a class="nav-link {{ request('status') === '1' ? 'active' : '' }}"
+                    href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '1'])) }}">In
+                    Progress</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link {{ request('status') === '1' ? 'active' : '' }}"
-               href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '1'])) }}">In Progress</a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link {{ request('status') === '2' ? 'active' : '' }}"
-               href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '2'])) }}">Resolved</a>
+                <a class="nav-link {{ request('status') === '2' ? 'active' : '' }}"
+                    href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '2'])) }}">Resolved</a>
             </li>
         </ul>
     </div>

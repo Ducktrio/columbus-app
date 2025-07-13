@@ -33,7 +33,7 @@
                     <a href="{{ route('managers.createUser') }}"
                         class="nav-link {{ request()->routeIs("managers.createUser") ? 'active' : 'text-black' }}"
                         aria-current="page">
-                        <i class="bi bi-file-plus-fill pe-none me-2">
+                        <i class="bi bi-{{ request()->routeIs('managers.createUser') ? 'file-plus-fill' : 'file-plus' }}  pe-none me-2">
                             <use xlink:href="#register">
                             </use>
                         </i>

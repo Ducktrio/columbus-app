@@ -20,16 +20,23 @@
                 <h2 for="service" class="mb-5">Select Service</h2>
 
                 <div class="d-flex gap-2 mb-5" id="service" role="group" aria-label="Service selection">
+
                     @php
 
-                        $selected = old('service');
+                        $selected = old('service_id');
+
                     @endphp
+                    
                     @foreach($services as $x)
-                        <input type="radio" class="btn-check" key="service" name="service_id" id="service-{{ $x->id }}"
-                            value="{{ $x->id }}" autocomplete="off" {{ $selected === $x->id ? 'checked' : '' }}>
-                        <label class="btn btn-outline-secondary {{ $selected === $x->id ? 'active' : '' }}"
-                            for="service-{{ $x->id }}">{{ $x->name }}</label>
+                        <input type="radio" class="btn-check" name="service_id" id="service-{{ Str::slug($x->id) }}"
+                            value="{{ $x->id }}" autocomplete="off"
+                            {{ $selected == $x->id ? 'checked' : '' }}>
+                        <label class="btn btn-outline-secondary"
+                            for="service-{{ Str::slug($x->id) }}">{{ $x->name }}</label>
                     @endforeach
+
+                    
+                   
                 </div>
 
 
@@ -77,7 +84,7 @@
 
                 <div class="mb-3">
                     <label for="details" class="form-label">Description</label>
-                    <textarea class="form-control" id="details" name="details" rows="3">{{ old('description') }}</textarea>
+                    <textarea class="form-control @error('details') is-invalid @enderror" id="details" name="details" rows="3" autocomplete="off">{{ old('details') }}</textarea>
                 </div>
 
 
