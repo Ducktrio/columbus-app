@@ -37,7 +37,12 @@ class RoomsController extends Controller
             $data = $updateRoomRequest->validated();
             $room->label = $data->label ?? $room->label;
             $room->room_type_id = $data->room_type_id ?? $room->room_type_id;
+            $room->save();
+            return redirect()->back()->with("success", "Room updated successfully");
+            // return response()->json(['message' => 'Room updated successfully', 200]);
         }
+        return redirect()->back()->with("error", "Room not found");
+        // return response()->json(['message' => 'Room not found', 404]);
     }
 
     public function delete($id)

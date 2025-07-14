@@ -7,7 +7,7 @@
 
     <div class="row mb-2">
 
-
+        <h1 class="mb-5">Manage Rooms</h1>
     
 
         <ul class="nav nav-pills nav-fill mb-3">

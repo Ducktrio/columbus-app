@@ -21,6 +21,7 @@ class ServiceTicketsController extends Controller
             ]);
             return redirect()->back()->with('success', 'Service ticket created successfully');
         }
+        return redirect()->back()->with('error', 'Failed to create service ticket');
     }
 
     public function get($id = null)
@@ -70,9 +71,9 @@ class ServiceTicketsController extends Controller
         if ($serviceTicket) {
             $serviceTicket->status = 1;
             $serviceTicket->save();
-            return response()->json(['message' => 'Service ticket taken successfully'], 200);
+            return redirect()->back()->with('success', 'Service ticket taken successfully');
         }
-        return response()->json(['message' => 'Service ticket not found'], 404);
+        return redirect()->back()->with('error', 'Service ticket not found');
     }
 
     public function close($id)
@@ -81,9 +82,9 @@ class ServiceTicketsController extends Controller
         if ($serviceTicket) {
             $serviceTicket->status = 2;
             $serviceTicket->save();
-            return response()->json(['message' => 'Service ticket closed successfully'], 200);
+            return redirect()->back()->with('success', 'Service ticket closed successfully');
         }
-        return response()->json(['message' => 'Service ticket not found'], 404);
+        return redirect()->back()->with('error', 'Service ticket not found');
     }
 
     public function search($id = null, $customer_id = null, $room_id = null, $service_id = null, $details = null)

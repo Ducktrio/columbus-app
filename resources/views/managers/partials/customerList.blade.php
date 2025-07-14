@@ -12,7 +12,7 @@
         <input type="radio" class="btn-check room-item" name="customer_id" id="room-{{ $customer->id }}" value="{{ $customer->id }}"
             autocomplete="off" {{ $customerSelected == $customer->id ? 'checked' : '' }} data-label="{{ strtolower($customer->label) }}"
             data-description="{{ strtolower($customer->description) }}">
-        <label for="room-{{ $customer->id }}" class="btn btn-outline-secondary text-center {{ $customerSelected == $customer->id ? 'active' : '' }}"
+        <label for="room-{{ $customer->id }}" class="btn btn-outline-secondary text-center"
             style="width:100%;">
             <div class="w-100 justify-content-between align-items-center">
                 <span class="me-2">

@@ -46,6 +46,18 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('staff123'),
             'description' => 'Hotel Staff'
         ]);
+        User::create([
+            'username' => 'Akmal Budi Santosa',
+            'role_id' => 'R_003',
+            'password' => bcrypt('akmal123'),
+            'description' => 'Hotel Staff'
+        ]);
+        User::create([
+            'username' => 'Budi Domifasol',
+            'role_id' => 'R_003',
+            'password' => bcrypt('budi123'),
+            'description' => 'Hotel Staff'
+        ]);
 
         $service = Service::create([
             'name' => 'Cleaning',
@@ -87,6 +99,17 @@ class DatabaseSeeder extends Seeder
 
         $room = Room::create([
             'label' => 'A1',
+            'room_type_id' => $type->id, 
+            'status' => '0',
+        ]);
+
+        Room::create([
+            'label' => 'A2',
+            'room_type_id' => $type->id, 
+            'status' => '0',
+        ]);
+        Room::create([
+            'label' => 'A3',
             'room_type_id' => $type->id, 
             'status' => '0',
         ]);

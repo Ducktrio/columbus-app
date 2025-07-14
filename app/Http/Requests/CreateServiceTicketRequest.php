@@ -49,6 +49,9 @@ class CreateServiceTicketRequest extends FormRequest
         if ($errors->has('details')) {
             $this->merge(['details' => '']);
         }
-        return redirect()->back()->with('error', $errors)->withInput();
+        return redirect()->back()->with('error', "Data input is invalid")->withInput(
+            $this->except(['_token']) // Exclude CSRF token and details from input
+
+        );
     }
 }
