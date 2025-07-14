@@ -37,13 +37,18 @@ class RoomTicket extends Model
     protected $fillable = [
         'customer_id',
         'room_id',
-        'check_in_date',
-        'check_out_date',
+        'check_in',
+        'check_out',
         'number_of_occupants',
     ];
 
     protected $hidden = [
         'updated_at',
+    ];
+
+    protected $casts = [
+        'check_in' => 'datetime',
+        'check_out' => 'datetime',
     ];
 
     public function room()
@@ -53,12 +58,12 @@ class RoomTicket extends Model
 
     public function customer()
     {
-        return $this->belongsTo(User::class, 'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
     
-    public function check_in()
+    public function checkIn()
     {
-        $this->check_in_date = now();
+        $this->check_in = now();
         $this->save();
 
         if ($this->room) {
@@ -67,9 +72,9 @@ class RoomTicket extends Model
         }
     }
 
-    public function check_out()
+    public function checkOut()
     {
-        $this->check_out_date = now();
+        $this->check_out = now();
         $this->status = 1;
         $this->save();
 

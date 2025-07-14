@@ -12,13 +12,16 @@ class CustomersController extends Controller
     {
         $data = $createCustomerRequest->validated();
         Customer::create([
-            'courtesy_title' => $data->courtesy_title,
-            'full_name' => $data->full_name,
-            'age' => $data->age,
-            'contact_info' => $data->contact_info,
-            'phone_number' => $data->phone_number,
+            'courtesy_title' => $data['courtesy_title'] ?? null,
+            'full_name' => $data['full_name'] ?? null,
+            'age' => $data['age'] ?? null,
+            'contact_info' => $data['contact_info'] ?? null,
+            'phone_number' => $data['phone_number'] ?? null,
         ]);
-        return response()->json(['message' => 'Customer created successfully', 201]);
+        if (isset($data['redirect_to']) && !empty($data['redirect_to'])) {
+            return redirect()->route($data['redirect_to'])->with('success', 'Customer created successfully');
+        }
+        return redirect()->back()->with('success', 'Customer created successfully');
     }
 
     public function get($id = null)

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\RoomsController;
+use App\Http\Controllers\RoomTicketsController;
 use App\Http\Controllers\ServiceTicketsController;
 use App\Http\Controllers\UsersController;
 use App\Models\Customer;
@@ -40,7 +42,6 @@ Route::prefix("auth")->group(function () {
     Route::post('login', [AuthController::class, "login"])->name("login.submit");               //  login.submit
 
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
-
 });
 
 Route::prefix('rooms')->group(function () {
@@ -70,8 +71,7 @@ Route::prefix('managers')->middleware('role:Manager')->group(function () {
 
             if ($request->filled('room_type')) {
                 $rooms->where('room_type_id', $request->query('room_type'));
-            }
-            else {
+            } else {
                 return redirect()->route('managers.manageRooms', array_merge($request->query(), ['room_type' => $roomType->id]));
             }
 
@@ -138,7 +138,7 @@ Route::prefix('managers')->middleware('role:Manager')->group(function () {
             } elseif ($status === '2') {
                 $tickets->where('status', 2);
             } else {
-                return redirect()->route('managers.listTickets', array_merge($request->query(),['status' => '0']));
+                return redirect()->route('managers.listTickets', array_merge($request->query(), ['status' => '0']));
             }
             $tickets = $tickets->paginate(6);
 
@@ -176,16 +176,13 @@ Route::prefix('managers')->middleware('role:Manager')->group(function () {
                 ]);
             }
             return view('managers.ticket.createTicket', ['rooms' => $rooms, 'services' => $services, "customers" => $customers]);
-
-
-
         })->name('managers.createTicket'); // managers.createTicket
 
         Route::post('create', [ServiceTicketsController::class, 'create'])->name('managers.createTicket.submit'); // managers.createTicket.submit
 
 
         Route::get('detail/{id}', function (string $id) {
-            $ticket = ServiceTicket::find($id);
+            $ticket = ServiceTicket::query()->find($id);
             if ($ticket) {
                 return view('managers.ticket.ticketDetail', ['ticket' => $ticket]);
             }
@@ -203,11 +200,88 @@ Route::prefix('managers')->middleware('role:Manager')->group(function () {
 Route::prefix('reception')->group(function () {
 
     Route::get('/', function () {
-        $roomCount = count(Room::query()->where('status', 0)->get()->all());
-        return view('receptionist.dashboard', ["roomCount" => $roomCount]);
-    })->name('reception');          //  receiptionist
+        $rooms = Room::query()->get()->all();
+        $roomTypes = RoomType::query()->get()->all();
 
 
+        return view('receptionist.dashboard', ["rooms" => $rooms, "roomTypes" => $roomTypes]);
+    })->name('reception');          //  receiption
+
+    Route::get('/checkin', function (Request $request) {
+        $customers = Customer::query();
+        $rooms = Room::query()->where('status', 0);
+
+        if ($request->ajax()) {
+            if ($request->has('searchCustomer')) {
+                $customers->where('full_name', 'LIKE', '%' . $request->query('searchCustomer') . '%');
+            }
+            if ($request->has('searchRoom')) {
+                $rooms->where('label', 'LIKE', '%' . $request->query('searchRoom') . '%')
+                    ->orWhereHas('roomType', function ($q) use ($request) {
+                        $q->where('name', 'LIKE', '%' . $request->query('searchRoom') . '%');
+                    });
+            }
+
+            $customers = $customers->paginate(6);
+            $rooms = $rooms->get()->all();
+
+            return response()->json([
+                'htmlCustomers' => view('receptionist.partials.customerList', compact('customers'))->render(),
+                'htmlRooms' => view('receptionist.partials.roomList', ['rooms' => $rooms, 'roomSelected' => $request->query('room_id')])->render(),
+            ]);
+        }
+
+        $customers = $customers->paginate(6);
+        $rooms = $rooms->get()->all();
+
+        return view('receptionist.checkin', ['customers' => $customers, "rooms" => $rooms]);
+    })->name('reception.checkin'); // receiption.checkin
+
+    Route::get("checkIn", [RoomTicketsController::class, 'checkIn'])->name('reception.checkin.checkin'); // receiption.checkin
+
+
+    Route::post('/checkin', [\App\Http\Controllers\RoomTicketsController::class, 'create'])->name('reception.checkin.submit'); // receiption.checkin.submit
+
+
+    Route::get('/checks', function (Request $request) {
+
+
+        $roomTickets = \App\Models\RoomTicket::query()->where('status', '!=', 1);
+
+        if ($request->query('filter') == '0') {
+            $roomTickets->whereNull('check_in');
+        } else if ($request->query('filter') == '1') {
+            $roomTickets->whereNotNull('check_in');
+        }
+
+        $roomTickets = $roomTickets->paginate(6);
+
+
+        return view('receptionist.checks', ['roomTickets' => $roomTickets]);
+    })->name('reception.checks'); // receiption.checks
+
+    Route::get('/checks/{id}', function (string $id) {
+        $roomTicket = \App\Models\RoomTicket::query()->find($id);
+        return view('receptionist.checkDetail', ['roomTicket' => $roomTicket]);
+    })->name('reception.checkDetail'); // receiption.checkDetail
+
+
+    Route::prefix('customer')->group(function () {
+
+        Route::get('/', function () {
+            $customers = Customer::query()->paginate(6);
+            return view('receptionist.customer.listCustomers', ['customers' => $customers]);
+        })->name('reception.customer'); // receiption.customer
+
+        Route::get('register', function (Request $request) {
+
+
+            return view('receptionist.customer.register')->with('redirect_to', $request->query('redirect_to', 'reception.checkin'));
+        })->name('reception.customer.register'); // receiption.customer.register
+
+        Route::post('register', [CustomersController::class, 'create'])->name('reception.customer.register.submit'); // receiption.customer.register.submit
+
+    });
 })->middleware('role:Receptionist'); // receiptionist
 
 
@@ -218,7 +292,7 @@ Route::prefix('staff')->group(function () {
         return redirect()->route('staff.dashboard');
     })->name('staff');       // staff
 
-   
+
 
     Route::get('/dashboard', function (Request $request) {
 
@@ -249,6 +323,7 @@ Route::prefix('staff')->group(function () {
         }
         return redirect()->route('staff.dashboard')->with('error', 'Ticket not found');
     })->name('staff.ticketDetail');          //  staff.ticketDetail
+
 
 })->middleware('role:Staff');
 

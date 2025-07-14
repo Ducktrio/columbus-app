@@ -52,7 +52,7 @@ class RoomsController extends Controller
         $room = Room::find($id);
         if ($room) {
             $room->delete();
-            return redirect()->route("managers.manageRooms")->with("success", "Room deleted successfully");
+            return redirect()->route("managers.manageRooms", ["status" => "0", "room_type" => RoomType::query()->first()->id])->with("success", "Room deleted successfully");
             // return response()->json(['message' => 'Room deleted successfully', 200]);
         }
         return redirect()->route("managers.manageRooms")->with("error", "Room not found");

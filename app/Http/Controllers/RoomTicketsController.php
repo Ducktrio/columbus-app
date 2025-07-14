@@ -11,12 +11,14 @@ class RoomTicketsController extends Controller
     public function create(CreateRoomTicketRequest $createRoomTicketRequest)
     {
         $data = $createRoomTicketRequest->validated();
-        RoomTicket::create([
-            'customer_id' => $data->customer_id,
-            'room_id' => $data->room_id,
-            'number_of_occupants' => $data->number_of_occupants,
+        $ticket = RoomTicket::create([
+            'customer_id' => $data['customer_id'],
+            'room_id' => $data['room_id'],
+            'number_of_occupants' => $data['number_of_occupants'],
         ]);
-        return response()->json(['message' => 'Room ticket created successfully'], 201);
+
+        return redirect()->route('reception.checkDetail', ['id' => $ticket->id])->with('message', 'Room ticket created successfully');
+        // return response()->json(['message' => 'Room ticket created successfully'], 201);
     }
 
     public function get($id = null)
@@ -54,21 +56,21 @@ class RoomTicketsController extends Controller
         return response()->json(['message' => 'Room ticket not found'], 404);
     }
 
-    public function checkIn($id)
+    public function checkIn(Request $request)
     {
-        $roomTicket = RoomTicket::get($id);
+        $roomTicket = RoomTicket::query()->find($request->query('id'));
         if ($roomTicket) {
-            $roomTicket->check_in();
-            return response()->json(['message' => 'Checked in successfully'], 200);
+            $roomTicket->checkIn();
+            return redirect()->back()->with('success', 'Checked in successfully');
         }
-        return response()->json(['message' => 'Room ticket not found'], 404);
+        return redirect()->back()->with('error', 'Room ticket not found');
     }
 
-    public function checkOut($id)
+    public function checkOut(Request $request, $id)
     {
         $roomTicket = RoomTicket::get($id);
         if ($roomTicket) {
-            $roomTicket->check_out();
+            $roomTicket->checkOut();
             return response()->json(['message' => 'Checked out successfully'], 200);
         }
         return response()->json(['message' => 'Room ticket not found'], 404);
