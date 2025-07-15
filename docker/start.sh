@@ -1,11 +1,9 @@
 #!/bin/sh
 
-mkdir -p /home/database
+php artisan migrate --force --seed
 
 chmod -R 664 /var/www/database/database.sqlite
 chown -R www-data:www-data /var/www/database/database.sqlite
-
-php artisan migrate --force --seed
 
 export APP_ENV=prod
 
