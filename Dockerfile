@@ -46,7 +46,6 @@ WORKDIR /var/www
 
 COPY . .
 
-COPY .env.prod .env.prod
 
 COPY --from=nodebuilder /app/public/build /var/www/public/build
 
@@ -59,7 +58,8 @@ RUN chown -R www-data:www-data /var/www \
 
 RUN php artisan config:cache \
  && php artisan route:cache \
- && php artisan view:cache
+ && php artisan view:cache \
+ && php artisan key:generate
 
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
