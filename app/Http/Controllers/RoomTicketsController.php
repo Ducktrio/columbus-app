@@ -11,12 +11,14 @@ class RoomTicketsController extends Controller
     public function create(CreateRoomTicketRequest $createRoomTicketRequest)
     {
         $data = $createRoomTicketRequest->validated();
-        RoomTicket::create([
-            'customer_id' => $data->customer_id,
-            'room_id' => $data->room_id,
-            'number_of_occupants' => $data->number_of_occupants,
+        $ticket = RoomTicket::create([
+            'customer_id' => $data['customer_id'],
+            'room_id' => $data['room_id'],
+            'number_of_occupants' => $data['number_of_occupants'],
         ]);
-        return response()->json(['message' => 'Room ticket created successfully'], 201);
+
+        return redirect()->route('reception.checkDetail', ['id' => $ticket->id])->with('message', 'Room ticket created successfully');
+        // return response()->json(['message' => 'Room ticket created successfully'], 201);
     }
 
     public function get($id = null)
@@ -49,29 +51,36 @@ class RoomTicketsController extends Controller
         $roomTicket = RoomTicket::find($id);
         if ($roomTicket) {
             $roomTicket->delete();
-            return response()->json(['message' => 'Room ticket deleted successfully'], 200);
+            return redirect()->back()->with('success', 'Room ticket deleted successfully');
         }
-        return response()->json(['message' => 'Room ticket not found'], 404);
+        return redirect()->back()->with('error', 'Room ticket not found');
     }
 
-    public function checkIn($id)
+    public function checkIn(Request $request)
     {
-        $roomTicket = RoomTicket::get($id);
-        if ($roomTicket) {
-            $roomTicket->check_in();
-            return response()->json(['message' => 'Checked in successfully'], 200);
+        $roomTicket = RoomTicket::query()->find($request->query('id'));
+        if($roomTicket->room->status === 2) {
+            return redirect()->back()->with('error', 'Room is not available for check-in');
         }
-        return response()->json(['message' => 'Room ticket not found'], 404);
+        else if ($roomTicket->room->status === 1) {
+            return redirect()->back()->with('error', 'Room is already checked in');
+        }
+     
+        if ($roomTicket) {
+            $roomTicket->checkIn();
+            return redirect()->back()->with('success', 'Checked in successfully');
+        }
+        return redirect()->back()->with('error', 'Room ticket not found');
     }
 
-    public function checkOut($id)
+    public function checkOut(Request $request)
     {
-        $roomTicket = RoomTicket::get($id);
+        $roomTicket = RoomTicket::query()->find($request->query('id'));
         if ($roomTicket) {
-            $roomTicket->check_out();
-            return response()->json(['message' => 'Checked out successfully'], 200);
+            $roomTicket->checkOut();
+            return redirect()->back()->with('success', 'Checked out successfully');
         }
-        return response()->json(['message' => 'Room ticket not found'], 404);
+        return redirect()->back()->with('error', 'Room ticket not found');
     }
 
     public function search($id = null, $customer_id = null, $room_id = null, $check_in_date = null, $check_out_date = null, $number_of_occupants = null)

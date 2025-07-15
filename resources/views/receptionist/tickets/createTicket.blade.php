@@ -1,18 +1,18 @@
-@extends('managers.base')
+@extends('receptionist.base')
 
 @section('outlet')
 
     <div class="container d-flex flex-column gap-4">
 
         <div class="row mb-5">
-            <h1 class="mb-2">Create Ticket</h1>
+            <h1 class="mb-2">Post Ticket</h1>
 
         </div>
 
 
         <div class="row">
 
-            <form method="POST" action="{{ route("managers.createTicket.submit") }}">
+            <form method="POST" action="{{ route("reception.tickets.create.submit") }}">
 
 
                 @csrf
@@ -23,7 +23,7 @@
 
                     @php
 
-                        $selected = old('service_id');
+                        $selected = request()->query('service') ?? old('service_id');
 
                     @endphp
                     
@@ -57,7 +57,7 @@
 
 
                 <div id="rooms-list" class="mb-5">
-                    @include('managers.partials.roomList', ['rooms' => $rooms])
+                    @include('receptionist.partials.roomList', ['rooms' => $rooms])
                 </div>
 
 
@@ -75,7 +75,7 @@
 
 
                 <div id="customers-list" class="mb-5">
-                    @include('managers.partials.customerList', ['customers' => $customers])
+                    @include('receptionist.partials.customerList', ['customers' => $customers])
                 </div>
 
                 <hr class="mb-5">
@@ -114,7 +114,7 @@
                 $('#searchRoom').on('keyup', function () {
                     queryRoom = $(this).val();
                     $.ajax({
-                        url: "{{ route('managers.createTicket') }}",
+                        url: "{{ route('reception.tickets.create') }}",
                         type: 'GET',
                         data: { searchRoom: queryRoom },
                         success: function (data) {
@@ -126,7 +126,7 @@
                 $('#searchCustomer').on('keyup', function () {
                     queryCustomer = $(this).val();
                     $.ajax({
-                        url: "{{ route('managers.createTicket') }}",
+                        url: "{{ route('reception.tickets.create') }}",
                         type: 'GET',
                         data: { searchCustomer: queryCustomer },
                         success: function (data) {

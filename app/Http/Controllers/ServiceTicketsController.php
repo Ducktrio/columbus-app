@@ -13,14 +13,15 @@ class ServiceTicketsController extends Controller
     {
         $data = $createServiceTicketRequest->validated();
         if ($data) {
-            ServiceTicket::create([
+            $ticket = ServiceTicket::create([
                 'customer_id' => $data['customer_id'],
                 'room_id' => $data['room_id'],
                 'service_id' => $data['service_id'],
                 'details' => $data['details'],
             ]);
-            return redirect()->back()->with('success', 'Service ticket created successfully');
+            return redirect()->back()->with('success', 'Service ticket created successfully')->with('id', $ticket->id);
         }
+        return redirect()->back()->with('error', 'Failed to create service ticket');
     }
 
     public function get($id = null)
@@ -70,20 +71,23 @@ class ServiceTicketsController extends Controller
         if ($serviceTicket) {
             $serviceTicket->status = 1;
             $serviceTicket->save();
-            return response()->json(['message' => 'Service ticket taken successfully'], 200);
+            return redirect()->back()->with('success', 'Service ticket taken successfully');
         }
-        return response()->json(['message' => 'Service ticket not found'], 404);
+        return redirect()->back()->with('error', 'Service ticket not found');
     }
 
     public function close($id)
     {
         $serviceTicket = ServiceTicket::find($id);
+        if($serviceTicket->service->name === 'Cleaning' && $serviceTicket->room->status === 2) {
+            return $this->prepareRoom($id);
+        }
         if ($serviceTicket) {
             $serviceTicket->status = 2;
             $serviceTicket->save();
-            return response()->json(['message' => 'Service ticket closed successfully'], 200);
+            return redirect()->back()->with('success', 'Service ticket closed successfully');
         }
-        return response()->json(['message' => 'Service ticket not found'], 404);
+        return redirect()->back()->with('error', 'Service ticket not found');
     }
 
     public function search($id = null, $customer_id = null, $room_id = null, $service_id = null, $details = null)
@@ -117,5 +121,21 @@ class ServiceTicketsController extends Controller
             return redirect()->back()->with('success', 'Service ticket status updated successfully');
         }
         return redirect()->back()->with('error', 'Service ticket not found');
+    }
+
+    public function prepareRoom($id) {
+        $ticket = ServiceTicket::find($id);
+        if($ticket->service->name !== 'Cleaning') {
+            return redirect()->back()->with('error', 'This service is not available for room preparation');
+        }
+        if($ticket->room->status !== 2) {
+            return redirect()->back()->with('error', 'Room is occupied, this is probably a standard request (not for checked out)');
+        }
+        $ticket->status = 2; // Set ticket to resolved
+        $ticket->room->status = 0; // Set to available
+        $ticket->save();
+        $ticket->room->save();
+        return redirect()->back()->with('success', 'Room are now available');
+
     }
 }

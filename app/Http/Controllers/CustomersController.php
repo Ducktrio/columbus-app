@@ -11,14 +11,19 @@ class CustomersController extends Controller
     public function create(CreateCustomerRequest $createCustomerRequest)
     {
         $data = $createCustomerRequest->validated();
-        Customer::create([
-            'courtesy_title' => $data->courtesy_title,
-            'full_name' => $data->full_name,
-            'age' => $data->age,
-            'contact_info' => $data->contact_info,
-            'phone_number' => $data->phone_number,
+        $customer = Customer::create([
+            'courtesy_title' => $data['courtesy_title'] ?? null,
+            'full_name' => $data['full_name'] ?? null,
+            'age' => $data['age'] ?? null,
+            'contact_info' => $data['contact_info'] ?? null,
+            'phone_number' => $data['phone_number'] ?? null,
         ]);
-        return response()->json(['message' => 'Customer created successfully', 201]);
+        if (isset($data['redirect_to']) && !empty($data['redirect_to'])) {
+            $redirectUrl = $data['redirect_to'];
+            $separator = (parse_url($redirectUrl, PHP_URL_QUERY) === null) ? '?' : '&';
+            return redirect()->to($redirectUrl . $separator . "customer=" . $customer->id)->with('success', 'Customer created successfully');
+        }
+        return redirect()->back()->with('success', 'Customer created successfully');
     }
 
     public function get($id = null)
