@@ -8,7 +8,7 @@
 
     <div class="card shadow-sm mx-auto" style="width: 100%; max-width: 400px;">
         <div class="card-body">
-            <h3 class="mb-4 text-center">Columbus</h3>
+            <h3 class="mb-4 text-center">{{ config('app.name')}}</h3>
 
             <form method="POST" action="{{ route('login.submit') }}">
                 @csrf
