@@ -154,5 +154,3 @@
         </div>
     </div>
 @endsection
-
-@include('components.toast')
