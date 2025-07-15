@@ -2,7 +2,7 @@
 
 /**
  * TODO: NEED A HUGE REFACTORING
- * 
+ *
  * This file is getting too big and hard to maintain.
  * I am just very lazy to manage controllers for this.
  * Sincerely, the lazy developer.
@@ -217,124 +217,124 @@ Route::prefix('reception')->group(function () {
         return view('receptionist.dashboard', ["rooms" => $rooms, "roomTypes" => $roomTypes]);
     })->name('reception');          //  receiption
 
-    Route::prefix('checks')->group(function() {
+    Route::prefix('checks')->group(function () {
 
         Route::get('/checkin', function (Request $request) {
-        $customers = Customer::query();
-        $rooms = Room::query()->where('status', 0);
+            $customers = Customer::query();
+            $rooms = Room::query()->where('status', 0);
 
-        if ($request->ajax()) {
-            if ($request->has('searchCustomer')) {
-                $customers->where('full_name', 'LIKE', '%' . $request->query('searchCustomer') . '%');
+            if ($request->ajax()) {
+                if ($request->has('searchCustomer')) {
+                    $customers->where('full_name', 'LIKE', '%' . $request->query('searchCustomer') . '%');
+                }
+                if ($request->has('searchRoom')) {
+                    $rooms->where('label', 'LIKE', '%' . $request->query('searchRoom') . '%')
+                        ->orWhereHas('roomType', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', '%' . $request->query('searchRoom') . '%');
+                        });
+                }
+
+                $customers = $customers->get()->all();
+                $rooms = $rooms->get()->all();
+
+                return response()->json([
+                    'htmlCustomers' => view('receptionist.partials.customerList', compact('customers'))->render(),
+                    'htmlRooms' => view('receptionist.partials.roomList', ['rooms' => $rooms, 'roomSelected' => $request->query('room_id')])->render(),
+                ]);
             }
-            if ($request->has('searchRoom')) {
-                $rooms->where('label', 'LIKE', '%' . $request->query('searchRoom') . '%')
-                    ->orWhereHas('roomType', function ($q) use ($request) {
-                        $q->where('name', 'LIKE', '%' . $request->query('searchRoom') . '%');
-                    });
+
+            if ($request->query('room')) {
+                session()->flash('info', 'Room [' . $request->query('room') . '] has been selected');
+                $rooms->orderBy('id', 'desc')
+                    ->where('id', $request->query('room'));
+            }
+            if ($request->query('customer')) {
+                session()->flash('info', 'Customer [' . $request->query('customer') . '] has been selected');
+                $customers->orderBy('id', 'desc')
+                    ->where('id', $request->query('customer'));
             }
 
             $customers = $customers->get()->all();
             $rooms = $rooms->get()->all();
 
-            return response()->json([
-                'htmlCustomers' => view('receptionist.partials.customerList', compact('customers'))->render(),
-                'htmlRooms' => view('receptionist.partials.roomList', ['rooms' => $rooms, 'roomSelected' => $request->query('room_id')])->render(),
-            ]);
-        }
-        
-        if($request->query('room')) {
-            session()->flash('info', 'Room [' . $request->query('room') . '] has been selected');
-            $rooms->orderBy('id', 'desc')
-                ->where('id', $request->query('room'));
-        }
-        if($request->query('customer')) {
-            session()->flash('info', 'Customer [' . $request->query('customer') . '] has been selected');
-            $customers->orderBy('id', 'desc')
-                ->where('id', $request->query('customer'));
-        }
 
-        $customers = $customers->get()->all();
-        $rooms = $rooms->get()->all();
+            $response = view('receptionist.checkin', ['customers' => $customers, "rooms" => $rooms]);
+            return $response;
+        })->name('reception.checkin'); // receiption.checkin
 
-        
-        $response = view('receptionist.checkin', ['customers' => $customers, "rooms" => $rooms]);
-        return $response;
-    })->name('reception.checkin'); // receiption.checkin
-
-    Route::get("checkIn", [RoomTicketsController::class, 'checkIn'])->name('reception.checkin.checkin'); // receiption.checkin
+        Route::get("checkIn", [RoomTicketsController::class, 'checkIn'])->name('reception.checkin.checkin'); // receiption.checkin
 
 
-    Route::post('/checkin', [RoomTicketsController::class, 'create'])->name('reception.checkin.submit'); // receiption.checkin.submit
+        Route::post('/checkin', [RoomTicketsController::class, 'create'])->name('reception.checkin.submit'); // receiption.checkin.submit
 
 
-    Route::get('/checks', function (Request $request) {
+        Route::get('/checks', function (Request $request) {
 
 
-        $roomTickets = \App\Models\RoomTicket::query()->where('status', '!=', 1)->whereNull('check_out');
+            $roomTickets = \App\Models\RoomTicket::query()->where('status', '!=', 1)->whereNull('check_out');
 
-        if ($request->query('filter') == '0') {
-            $roomTickets->whereNull('check_in');
-        } else if ($request->query('filter') == '1') {
-            $roomTickets->whereNotNull('check_in');
-        }
+            if ($request->query('filter') == '0') {
+                $roomTickets->whereNull('check_in');
+            } else if ($request->query('filter') == '1') {
+                $roomTickets->whereNotNull('check_in');
+            }
 
-        if($request->ajax()) {
-            if ($request->has('search')) {
-                $roomTickets->whereHas('room', function ($query) use ($request) {
-                    $query->where('label', 'LIKE', '%' . $request->query('search') . '%');
-                })->orWhereHas('customer', function ($query) use ($request) {
-                    $query->where('full_name', 'LIKE', '%' . $request->query('search') . '%');
-                })->where('status', '!=', 1)->whereNull('check_out');
+            if ($request->ajax()) {
+                if ($request->has('search')) {
+                    $roomTickets->whereHas('room', function ($query) use ($request) {
+                        $query->where('label', 'LIKE', '%' . $request->query('search') . '%');
+                    })->orWhereHas('customer', function ($query) use ($request) {
+                        $query->where('full_name', 'LIKE', '%' . $request->query('search') . '%');
+                    })->where('status', '!=', 1)->whereNull('check_out');
+                }
+
+                $roomTickets = $roomTickets->paginate(6);
+
+                return response()->json([
+                    'html' => view('receptionist.partials.checkList', ['roomTickets' => $roomTickets])->render(),
+                ]);
             }
 
             $roomTickets = $roomTickets->paginate(6);
 
-            return response()->json([
-                'html' => view('receptionist.partials.checkList', ['roomTickets' => $roomTickets])->render(),
-            ]);
-        }
 
-        $roomTickets = $roomTickets->paginate(6);
+            return view('receptionist.checks', ['roomTickets' => $roomTickets]);
+        })->name('reception.checks'); // receiption.checks
 
+        Route::get('/checks/{id}', function (string $id) {
+            $roomTicket = \App\Models\RoomTicket::query()->find($id);
+            if (!$roomTicket) {
+                return redirect()->route('reception.checks');
+            }
 
-        return view('receptionist.checks', ['roomTickets' => $roomTickets]);
-    })->name('reception.checks'); // receiption.checks
+            return view('receptionist.checkDetail', ['roomTicket' => $roomTicket]);
+        })->name('reception.checkDetail'); // receiption.checkDetail
 
-    Route::get('/checks/{id}', function (string $id) {
-        $roomTicket = \App\Models\RoomTicket::query()->find($id);
-        if(!$roomTicket) {
-            return redirect()->route('reception.checks');
-        }
+        Route::get('/checkout', function (Request $request) {
+            $roomTickets = \App\Models\RoomTicket::query()->whereNotNull('check_in')->whereNull('check_out');
 
-        return view('receptionist.checkDetail', ['roomTicket' => $roomTicket]);
-    })->name('reception.checkDetail'); // receiption.checkDetail
+            if ($request->ajax()) {
+                if ($request->has('search')) {
+                    $roomTickets->whereHas('room', function ($query) use ($request) {
+                        $query->where('label', 'LIKE', '%' . $request->query('search') . '%');
+                    })->orWhereHas('customer', function ($query) use ($request) {
+                        $query->where('full_name', 'LIKE', '%' . $request->query('search') . '%');
+                    });
+                }
 
-    Route::get('/checkout', function(Request $request) {
-        $roomTickets = \App\Models\RoomTicket::query()->whereNotNull('check_in')->whereNull('check_out');
+                $roomTickets = $roomTickets->paginate(6);
 
-        if ($request->ajax()) {
-            if ($request->has('search')) {
-                $roomTickets->whereHas('room', function ($query) use ($request) {
-                    $query->where('label', 'LIKE', '%' . $request->query('search') . '%');
-                })->orWhereHas('customer', function ($query) use ($request) {
-                    $query->where('full_name', 'LIKE', '%' . $request->query('search') . '%');
-                });
+                return response()->json([
+                    'html' => view('receptionist.partials.checkList', ['roomTickets' => $roomTickets])->render(),
+                ]);
             }
 
             $roomTickets = $roomTickets->paginate(6);
 
-            return response()->json([
-                'html' => view('receptionist.partials.checkList', ['roomTickets' => $roomTickets])->render(),
-            ]);
-        }
+            return view('receptionist.checkout', ['roomTickets' => $roomTickets]);
+        })->name('reception.checkout'); // receiption.checkout
 
-        $roomTickets = $roomTickets->paginate(6);
-
-        return view('receptionist.checkout', ['roomTickets' => $roomTickets]);
-    })->name('reception.checkout'); // receiption.checkout
-
-    Route::get('/checkOut', [RoomTicketsController::class, 'checkOut'])->name('reception.checkout.checkout'); // receiption.checkout.checkOut
+        Route::get('/checkOut', [RoomTicketsController::class, 'checkOut'])->name('reception.checkout.checkout'); // receiption.checkout.checkOut
 
 
     });
@@ -362,14 +362,14 @@ Route::prefix('reception')->group(function () {
             $rooms = Room::query();
             $roomTypes = RoomType::query()->get()->all();
 
-            if($request->ajax()){
+            if ($request->ajax()) {
                 if ($request->has('search')) {
                     $rooms->where('label', 'LIKE', '%' . $request->query('search') . '%')
                         ->orWhereHas('roomType', function ($query) use ($request) {
                             $query->where('name', 'LIKE', '%' . $request->query('search') . '%');
                         });
                 }
-                
+
                 return response()->json([
                     'html' => view('receptionist.partials.roomList', ['rooms' => $rooms->get()->all(), 'roomTypes' => $roomTypes])->render(),
                 ]);
@@ -392,7 +392,7 @@ Route::prefix('reception')->group(function () {
         })->name('reception.rooms'); // receiption.rooms
 
         Route::get('/detail/{id}', function (string $id) {
-            $room = Room::find($id);
+            $room = Room::query()->find($id);
             if ($room) {
                 return view('receptionist.rooms.roomDetail', ['room' => $room]);
             }
@@ -401,7 +401,7 @@ Route::prefix('reception')->group(function () {
     });
 
     Route::prefix('tickets')->group(function () {
-        
+
         Route::get('list', function (Request $request) {
             $tickets = ServiceTicket::query();
 
@@ -434,7 +434,7 @@ Route::prefix('reception')->group(function () {
             return redirect()->route('reception.tickets.list')->with('error', 'Ticket not found');
         })->name('reception.tickets.ticketDetail'); // receiption.tickets.detail
 
-        Route::get('create', function(Request $request) {
+        Route::get('create', function (Request $request) {
             /**
              * Fetch for room tickets that are at least checked in, including checked out.
              * This is to allow receptionist to create a service ticket for a room that has already checked.
@@ -444,11 +444,11 @@ Route::prefix('reception')->group(function () {
             $customers = Customer::query();
             $services = Service::query()->get()->all();
 
-            if(session('success')) {
+            if (session('success')) {
                 return redirect()->route('reception.tickets.ticketDetail', ["id" => session('id')])->with('success', session('success'));
             }
 
-            
+
             if ($request->ajax()) {
                 if ($request->has('searchRoom')) {
                     $rooms->where('label', 'LIKE', '%' . $request->query('searchRoom') . '%')
@@ -470,11 +470,11 @@ Route::prefix('reception')->group(function () {
                 ]);
             }
 
-            if($request->query('room')) {
+            if ($request->query('room')) {
                 $rooms->orderBy('id', 'desc')
                     ->where('id', $request->query('room'));
             }
-            if($request->query('customer')) {
+            if ($request->query('customer')) {
                 $customers->orderBy('id', 'desc')
                     ->where('id', $request->query('customer'));
             }
@@ -483,24 +483,21 @@ Route::prefix('reception')->group(function () {
             $rooms = $rooms->get()->all();
 
             $response = view('receptionist.tickets.createTicket', [
-                "roomTickets" => $roomTickets
-                , "rooms" => $rooms,
+                "roomTickets" => $roomTickets,
+                "rooms" => $rooms,
                 "customers" => $customers,
                 "services" => $services
             ]);
 
-            if($request->query('room')) {
+            if ($request->query('room')) {
                 session()->flash('info', 'Some fields have been filled. You just need to fill the details.');
             }
 
             return $response;
-
         })->name('reception.tickets.create'); // receiption.tickets.create
 
         Route::post('create', [ServiceTicketsController::class, 'create'])->name('reception.tickets.create.submit'); // receiption.tickets.create.submit
     });
-
-
 })->middleware('role:Receptionist'); // receiptionist
 
 
