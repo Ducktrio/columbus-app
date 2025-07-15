@@ -74,12 +74,6 @@
                         Available
                     </a>
                 </button>
-                <button class="btn btn-outline-secondary {{ $room->status == "1" ? 'text-bg-primary' : ''}}">
-                    <a href="{{ route('managers.updateRoomStatus', ['id' => $room->id, 'status' => 1]) }}"
-                        class="text-decoration-none text-reset">
-                        Occupied
-                    </a>
-                </button>
                 <button class="btn btn-outline-secondary {{ $room->status == "2" ? 'text-bg-primary' : ''}}">
                     <a href="{{ route('managers.updateRoomStatus', ['id' => $room->id, 'status' => 2]) }}"
                         class="text-decoration-none text-reset">
