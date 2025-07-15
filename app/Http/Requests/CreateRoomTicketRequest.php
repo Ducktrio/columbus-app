@@ -27,9 +27,18 @@ class CreateRoomTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'redirect_to' => 'nullable|string',
             'customer_id' => 'required|exists:customers,id',
             'room_id' => 'required|exists:rooms,id',
             'number_of_occupants' => 'required|numeric',
         ];
+    }
+
+    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput()
+            ->with('error', 'Validation failed');
     }
 }

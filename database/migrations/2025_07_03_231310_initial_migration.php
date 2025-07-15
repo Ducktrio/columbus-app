@@ -69,8 +69,8 @@ return new class extends Migration {
             $table->string('id')->primary();
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
-            $table->dateTime('check_in')->nullable();
-            $table->dateTime('check_out')->nullable();
+            $table->timestamp('check_in')->nullable();
+            $table->timestamp('check_out')->nullable();
             $table->integer('number_of_occupants');
             $table->integer('status')->default(0);
             $table->timestamp('created_at')->useCurrent();

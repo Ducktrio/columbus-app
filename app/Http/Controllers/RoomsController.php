@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use App\Http\Requests\CreateRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
+use App\Models\RoomTicket;
+use App\Models\RoomType;
 use Illuminate\Http\Request;
 use App\Models\Room;
 
@@ -15,7 +17,7 @@ class RoomsController extends Controller
             'label' => $data['label'],
             'room_type_id' => $data['room_type_id']
         ]);
-        return redirect()->route("managers.manageRooms")->with("success", "Room [" . $data['label'] . "] is registered");
+        return redirect()->route("managers.manageRooms", ['status' => '0', "room_type" => RoomType::query()->get()->first()->id])->with("success", "Room [" . $data['label'] . "] is registered");
     }
 
     public function get($id = null)
@@ -35,8 +37,8 @@ class RoomsController extends Controller
         $room = Room::find($id);
         if ($room) {
             $data = $updateRoomRequest->validated();
-            $room->label = $data->label ?? $room->label;
-            $room->room_type_id = $data->room_type_id ?? $room->room_type_id;
+            $room->label = $data['label'] ?? $room->label;
+            $room->room_type_id = $data['room_type_id'] ?? $room->room_type_id;
             $room->save();
             return redirect()->back()->with("success", "Room updated successfully");
             // return response()->json(['message' => 'Room updated successfully', 200]);
@@ -50,7 +52,7 @@ class RoomsController extends Controller
         $room = Room::find($id);
         if ($room) {
             $room->delete();
-            return redirect()->route("managers.manageRooms")->with("success", "Room deleted successfully");
+            return redirect()->route("managers.manageRooms", ["status" => "0", "room_type" => RoomType::query()->first()->id])->with("success", "Room deleted successfully");
             // return response()->json(['message' => 'Room deleted successfully', 200]);
         }
         return redirect()->route("managers.manageRooms")->with("error", "Room not found");
