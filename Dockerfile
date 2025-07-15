@@ -61,6 +61,13 @@ RUN php artisan config:cache \
  && php artisan view:cache \
  && php artisan key:generate
 
+RUN php artisan migrate --force --seed
+
+RUN chmod -R 664 /var/www/database/database.sqlite
+
+RUN chown -R www-data:www-data /var/www/database/database.sqlite
+
+
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/start.sh /start.sh
