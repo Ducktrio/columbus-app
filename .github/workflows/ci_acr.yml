@@ -1,4 +1,8 @@
 name: Staging to Ducktrio ACR
+on:
+  push:
+    branches:
+      - main
 env:
   ACR_LOGIN_SERVER: ${{secrets.ACR_LOGIN_SERVER}}
   IMAGE_NAME: ${{secrets.IMAGE_NAME}}
