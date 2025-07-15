@@ -1,0 +1,38 @@
+name: PRs Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  prevent-invalid-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR is from 'development' branch
+        run: |
+          echo "Base: ${{ github.event.pull_request.base.ref }}"
+          echo "Head: ${{ github.event.pull_request.head.ref }}"
+
+          if [[ "${{ github.event.pull_request.head.ref }}" != "development" ]]; then
+            echo "❌ Pull requests to 'main' are only allowed from 'development'."
+            exit 1
+          else
+            echo "✅ Pull request is from 'development'."
+          fi
+
+  comment-on-failure:
+    needs: prevent-invalid-pr
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on the PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "🚫 This pull request targets the **main** branch, but it must originate from the **development** branch.\n\n👉 Please rebase or recreate this PR using `development` as the source branch."
+            })

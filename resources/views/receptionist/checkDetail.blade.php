@@ -77,10 +77,6 @@
                     <hr>
 
 
-                    @php
-                        dump($roomTicket->id);
-                        dump($roomTicket->check_in);
-                    @endphp
 
                     <a class="btn btn-outline-primary mb-4"
                         href="{{ route('reception.checkin.checkin', ['id' => $roomTicket->id]) }}">Check In</a>
