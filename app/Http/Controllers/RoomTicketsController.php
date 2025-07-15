@@ -51,14 +51,21 @@ class RoomTicketsController extends Controller
         $roomTicket = RoomTicket::find($id);
         if ($roomTicket) {
             $roomTicket->delete();
-            return response()->json(['message' => 'Room ticket deleted successfully'], 200);
+            return redirect()->back()->with('success', 'Room ticket deleted successfully');
         }
-        return response()->json(['message' => 'Room ticket not found'], 404);
+        return redirect()->back()->with('error', 'Room ticket not found');
     }
 
     public function checkIn(Request $request)
     {
         $roomTicket = RoomTicket::query()->find($request->query('id'));
+        if($roomTicket->room->status === 2) {
+            return redirect()->back()->with('error', 'Room is not available for check-in');
+        }
+        else if ($roomTicket->room->status === 1) {
+            return redirect()->back()->with('error', 'Room is already checked in');
+        }
+     
         if ($roomTicket) {
             $roomTicket->checkIn();
             return redirect()->back()->with('success', 'Checked in successfully');
@@ -66,14 +73,14 @@ class RoomTicketsController extends Controller
         return redirect()->back()->with('error', 'Room ticket not found');
     }
 
-    public function checkOut(Request $request, $id)
+    public function checkOut(Request $request)
     {
-        $roomTicket = RoomTicket::get($id);
+        $roomTicket = RoomTicket::query()->find($request->query('id'));
         if ($roomTicket) {
             $roomTicket->checkOut();
-            return response()->json(['message' => 'Checked out successfully'], 200);
+            return redirect()->back()->with('success', 'Checked out successfully');
         }
-        return response()->json(['message' => 'Room ticket not found'], 404);
+        return redirect()->back()->with('error', 'Room ticket not found');
     }
 
     public function search($id = null, $customer_id = null, $room_id = null, $check_in_date = null, $check_out_date = null, $number_of_occupants = null)

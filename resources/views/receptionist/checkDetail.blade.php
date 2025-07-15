@@ -2,6 +2,12 @@
 
 @section('outlet')
 
+<div class="row">
+    <h1>Room Check #{{ $roomTicket->id }}</h1>
+</div>
+
+<hr class="mb-5">
+
     <div class="row">
         <div class="col d-flex flex-column gap-4">
 
@@ -48,42 +54,95 @@
 
         <div class="col d-flex flex-column gap-4">
 
-            <!-- when open status -->
-            <div class="card card-body text-center">
+            <!-- when pending check in status -->
+            @if(!$roomTicket->check_in)
 
-                <h2 class="mb-4">Receipt</h2>
-                <p class="text-muted">{{ $roomTicket->created_at->format('F j, Y, g:i a') }}</p>
 
-                <hr>
+                <div class="card card-body text-center">
 
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>Room Charge</span>
-                        <span class="fs-5">
-                            Rp {{ number_format($roomTicket->room->roomType->price, 0, ',', '.') }}
-                        </span>
-                    </li>
-                </ul>
+                    <h2 class="mb-4">Receipt</h2>
+                    <p class="text-muted">{{ $roomTicket->created_at->format('F j, Y, g:i a') }}</p>
 
-                <hr>
+                    <hr>
 
-                @if($roomTicket->status === 0 && !$roomTicket->check_in)
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Room Charge</span>
+                            <span class="fs-5">
+                                Rp {{ number_format($roomTicket->room->roomType->price, 0, ',', '.') }}
+                            </span>
+                        </li>
+                    </ul>
+
+                    <hr>
+
 
                     @php
                         dump($roomTicket->id);
                         dump($roomTicket->check_in);
                     @endphp
 
-                    <a class="btn btn-outline-primary"
+                    <a class="btn btn-outline-primary mb-4"
                         href="{{ route('reception.checkin.checkin', ['id' => $roomTicket->id]) }}">Check In</a>
-                @elseif($roomTicket->status === 1)
-                    <a class="btn btn-outline-success" href="#">Check Out</a>
-                @endif
-            </div>
+                    <a class="btn btn-outline-danger"
+                        href="{{ route('checks.delete', ['id' => $roomTicket->id]) }}"
+                        onclick="return confirm('Are you sure you want to cancel this booking?')">
+                        Cancel Book
+                    </a>
+                </div>
+
+                <!-- when checked in status -->
+
+            @elseif($roomTicket->status === 0 && $roomTicket->check_in)
 
 
+                <div class="card card-body text-center d-flex flex-column justify-content-between">
 
-        </div>
+
+                    Checked In at {{ $roomTicket->check_in->diffForHumans() }}
+
+                    <div class="d-grid gap-4">
+                        <span>Customer request service?</span>
+                        <a class="btn btn-outline-secondary"
+                            href="{{ route('reception.tickets.create', ['room' => $roomTicket->room->id, "customer" => $roomTicket->customer->id]) }}"><i class="bi bi-ticket-detailed me-2"></i>Request Service</a>
+                    </div>
+
+                    <a class="btn btn-outline-primary"
+                        href="{{ route('reception.checkout.checkout', ['id' => $roomTicket->id]) }}"
+                        onclick="return confirm('Are you sure you want to check out this room?')">Check Out</a>
+
+
+                </div>
+
+                <!-- when checked out status -->
+
+            @elseif($roomTicket->status === 1)
+                    <div class="card card-body text-center">
+                        <h2 class="mb-4">Checked Out</h2>
+                        <p class="text-muted">Checked out at {{ $roomTicket->check_out->format('F j, Y, g:i a') }}</p>
+                        <hr>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Room Charge</span>
+                                <span class="fs-5">
+                                    Rp {{ number_format($roomTicket->room->roomType->price, 0, ',', '.') }}
+                                </span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Total</span>
+                                <span class="fs-5">
+                                    Rp {{ number_format($roomTicket->room->roomType->price, 0, ',', '.') }}
+                                </span>
+                            </li>
+                        </ul>
+                        <hr>
+                    </div>
+                </div>
+
+            @endif
+
+
+    </div>
     </div>
 
 @endsection

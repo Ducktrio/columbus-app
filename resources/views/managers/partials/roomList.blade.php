@@ -6,6 +6,7 @@
     @endif
 
     @php
+
         $roomSelected = old('room_id');
 
     @endphp

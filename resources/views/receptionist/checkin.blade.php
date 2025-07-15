@@ -115,7 +115,9 @@
                 $.ajax({
                     url: "{{ route('reception.checkin') }}",
                     type: 'GET',
-                    data: { searchCustomer: queryCustomer },
+                    data: Object.assign(
+                        { searchCustomer: queryCustomer },
+                    ),
                     success: function (data) {
                         $('#customers-list').html(data.htmlCustomers);
                     }

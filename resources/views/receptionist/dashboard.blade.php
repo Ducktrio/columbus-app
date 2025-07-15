@@ -27,7 +27,8 @@
         </div>
 
         <div class="col-4">
-            <div role="button" data-bs-toggle="collapse" data-bs-target="#unavailableRooms" class="card border mb-3 text-bg-warning">
+            <div role="button" data-bs-toggle="collapse" data-bs-target="#unavailableRooms"
+                class="card border mb-3 text-bg-warning">
                 <div class="card-header">Unavailable Rooms</div>
                 <div class="card-body d-flex align-items-center justify-content-center">
                     <h1 class="card-title">
@@ -91,19 +92,26 @@
                 <span>Check In</span>
             </a>
 
-            <a href="#" class="btn btn-outline-dark d-grid fs-4 p-5">
+            <a href="{{ route('reception.checkout') }}" class="btn btn-outline-dark d-grid fs-4 p-5">
                 <i class="bi bi-door-open"></i>
                 <span>Check Out</span>
             </a>
 
-            <a href="#" class="btn btn-outline-dark d-grid fs-4 p-5">
+            <a href="{{ route('reception.tickets') }}" class="btn btn-outline-dark d-grid fs-4 p-5">
                 <i class="bi bi-ticket-detailed"></i>
                 <span>Service</span>
             </a>
 
-            <a href="#" class="btn btn-outline-dark d-grid fs-4 p-5">
+            <a href="{{ route('reception.rooms', ["status" => 2]) }}" class="btn btn-outline-dark d-grid fs-4 p-5 position-relative">
                 <i class="bi bi-door-closed"></i>
                 <span>Prepare Room</span>
+                @if(\App\Models\Room::where('status', 2)->count() > 0)
+                    <span class="position-absolute top-0 end-0 translate-middle p-1">
+                        <span class="spinner-grow text-warning" role="status">
+                            <span class="visually-hidden">Warning</span>
+                        </span>
+                    </span>
+                @endif
             </a>
 
 

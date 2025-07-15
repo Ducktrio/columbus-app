@@ -30,7 +30,7 @@
 
                 <hr>
 
-                <!-- Room management -->
+                <!-- Checks management -->
                 <li class="nav-item">
                     <a href="{{ route('reception.checkin') }}"
                         class="nav-link {{ request()->routeIs("reception.checkin") ? 'active' : 'text-black' }}"
@@ -40,20 +40,20 @@
                             <use xlink:href="#checkin">
                             </use>
                         </i>
-                        Room Check In
+                        Check In
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('managers.createUser') }}"
-                        class="nav-link {{ request()->routeIs("receiption.checkout") ? 'active' : 'text-black' }}"
+                    <a href="{{ route('reception.checkout') }}"
+                        class="nav-link {{ request()->routeIs("reception.checkout") ? 'active' : 'text-black' }}"
                         aria-current="page">
                         <i
-                            class="bi {{ request()->routeIs("receiption.checkout") ? 'bi-door-closed-fill' : 'bi-door-closed' }} pe-none me-2">
+                            class="bi {{ request()->routeIs("reception.checkout") ? 'bi-door-closed-fill' : 'bi-door-closed' }} pe-none me-2">
                             <use xlink:href="#checkout">
                             </use>
                         </i>
-                        Room Check Out
+                        Check Out
                     </a>
                 </li>
 
@@ -62,11 +62,73 @@
                         class="nav-link {{ request()->routeIs("reception.checks") ? 'active' : 'text-black' }}"
                         aria-current="page">
                         <i
-                            class="bi {{ request()->routeIs("reception.checks") ? 'bi-check2-square' : 'bi-check2-square' }} pe-none me-2">
+                            class="bi {{ request()->routeIs("reception.checks") ? 'bi-journal-text' : 'bi-journal-text' }} pe-none me-2">
                             <use xlink:href="#checks">
                             </use>
                         </i>
-                        Room Checks
+
+                        Checks
+
+                        <br>
+
+                        @if(\App\Models\RoomTicket::query()->whereNull('check_in')->count() > 0)
+                            <span class="badge bg-danger ms-2">
+                                {{ \App\Models\RoomTicket::query()->whereNull('check_in')->count()}} Pending
+                            </span>
+                        @endif
+
+                    </a>
+                </li>
+
+                <hr>
+
+                <!-- Room List -->
+                <li class="nav-item">
+                    <a href="{{ route('reception.rooms') }}"
+                        class="nav-link {{ request()->routeIs("reception.rooms") ? 'active' : 'text-black' }}"
+                        aria-current="page">
+                        <i
+                            class="bi {{ request()->routeIs("reception.rooms") ? 'bi-door-open-fill' : 'bi-door-open' }} pe-none me-2">
+                            <use xlink:href="#tickets">
+                            </use>
+                        </i>
+                        Rooms
+
+                        @if(\App\Models\Room::query()->where('status', 2)->count() > 0)
+                            <span class="badge bg-danger ms-2">
+                                {{ \App\Models\Room::query()->where('status', 2)->count()}} Unavailable
+                            </span>
+                        @endif
+
+                    </a>
+                </li>
+
+                <hr>
+
+                <!-- Service Tickets -->
+                <li class="nav-item">
+                    <a href="{{ route('reception.tickets') }}"
+                        class="nav-link {{ request()->routeIs("reception.tickets") ? 'active' : 'text-black' }}"
+                        aria-current="page">
+                        <i
+                            class="bi {{ request()->routeIs("reception.tickets") ? 'bi-ticket-detailed-fill' : 'bi-ticket-detailed' }} pe-none me-2">
+                            <use xlink:href="#tickets">
+                            </use>
+                        </i>
+                        Service Tickets
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('reception.tickets.create') }}"
+                        class="nav-link {{ request()->routeIs("reception.tickets.create") ? 'active' : 'text-black' }}"
+                        aria-current="page">
+                        <i
+                            class="bi {{ request()->routeIs("reception.tickets,create") ? 'bi-ticket-detailed-fill' : 'bi-ticket-detailed' }} pe-none me-2">
+                            <use xlink:href="#tickets">
+                            </use>
+                        </i>
+                        Post Ticket
                     </a>
                 </li>
 

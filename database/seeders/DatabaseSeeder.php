@@ -114,64 +114,7 @@ class DatabaseSeeder extends Seeder
             'status' => '0',
         ]);
 
-        $customers = [
-            [
-            'courtesy_title' => 'Mr.',
-            'full_name' => 'John Doe',
-            'age' => 30,
-            'phone_number' => '1234567890',
-            ],
-            [
-            'courtesy_title' => 'Ms.',
-            'full_name' => 'Jane Smith',
-            'age' => 28,
-            'phone_number' => '0987654321',
-            ],
-            [
-            'courtesy_title' => 'Mrs.',
-            'full_name' => 'Emily Johnson',
-            'age' => 35,
-            'phone_number' => '1112223333',
-            ],
-            [
-            'courtesy_title' => 'Mr.',
-            'full_name' => 'Michael Brown',
-            'age' => 40,
-            'phone_number' => '2223334444',
-            ],
-            [
-            'courtesy_title' => 'Ms.',
-            'full_name' => 'Linda Davis',
-            'age' => 27,
-            'phone_number' => '3334445555',
-            ],
-            [
-            'courtesy_title' => 'Dr.',
-            'full_name' => 'Robert Wilson',
-            'age' => 50,
-            'phone_number' => '4445556666',
-            ],
-            [
-            'courtesy_title' => 'Miss',
-            'full_name' => 'Sophia Martinez',
-            'age' => 22,
-            'phone_number' => '5556667777',
-            ],
-        ];
-
-        $customerModels = [];
-        foreach ($customers as $customerData) {
-            $customerModels[] = Customer::create($customerData);
-        }
-
-        // Create ServiceTickets for each customer
-        foreach ($customerModels as $index => $customer) {
-            ServiceTicket::create([
-            'customer_id' => $customer->id,
-            'room_id' => $room->id,
-            'service_id' => $service->id,
-            'details' => 'Request for room cleaning at ' . (15 + $index) . ':00 PM',
-            ]);
-        }
+     
+       
     }
 }

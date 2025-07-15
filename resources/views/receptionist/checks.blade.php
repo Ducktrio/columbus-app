@@ -22,54 +22,23 @@
             <li class="nav-item">
                 <a class="nav-link {{  request()->query('filter') === '1' ? 'active' : '' }}"
                     href="{{  route('reception.checks', ['filter' => "1"]) }}">Checked In
-                    @if (\App\Models\RoomTicket::query()->whereNotNull('check_in')->count() > 0)
-                        <span
-                            class="badge rounded-pill bg-danger ms-2">{{ \App\Models\RoomTicket::query()->whereNotNull('check_in')->count() }}</span>
-                    @endif
+
+
                 </a>
             </li>
         </ul>
 
         <div class="row">
 
-            @foreach($roomTickets as $ticket)
+            <div class="mb-4">
+                <input type="search" class="form-control" placeholder="Search by room number or customer name" id="search">
+            </div>
 
-                <div class="col-4">
+            <div id="lists" class="row g-4">
 
-                    <a role="div" class="card card-body text-bg-dark mb-3 text-decoration-none" data-bs-toggle="collapse"
-                        data-bs-target="#ticket-{{ $ticket->id }}">
+                @include('receptionist.partials.checkList', ['roomTickets' => $roomTickets])
 
-                        <h4 class="">Room {{ $ticket->room->label }}</h4>
-
-                    </a>
-
-                    <a class="collapse text-decoration-none" href="{{ route('reception.checkDetail', ["id" => $ticket->id]) }}"
-                        id="ticket-{{ $ticket->id }}">
-
-                        <div class="card card-body text-bg-light mb-3">
-                            <h5 class="mb-3">Ticket Details</h5>
-                            <p>{{ $ticket->details }}</p>
-                            <p><i class="bi bi-people-fill"></i> {{ $ticket->number_of_occupants }}</p>
-
-                            <p><i class="bi bi-person-fill"></i> {{ $ticket->customer->courtesy_title }}
-                                {{ $ticket->customer->full_name }}
-                            </p>
-
-                            @if ($ticket->check_in === null)
-
-                                <p>Status: <span class="badge text-bg-warning">Pending Check-in</span></p>
-
-                            @else
-
-                                <p>Status: <span class="badge text-bg-success">Checked In</span></p>
-
-                            @endif
-                        </div>
-                    </a>
-
-                </div>
-
-            @endforeach
+            </div>
 
         </div>
 
@@ -78,3 +47,23 @@
 
 
 @endsection
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+
+        $('#search').on('keyup', function () {
+            let query = $(this).val();
+            $.ajax({
+                url: "{{ route('reception.checks') }}",
+                type: 'GET',
+                data: { search: query },
+                success: function (data) {
+                    $('#lists').html(data.html);
+                }
+            });
+        });
+    });
+</script>

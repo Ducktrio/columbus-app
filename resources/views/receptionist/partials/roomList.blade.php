@@ -6,7 +6,7 @@
     @endif
 
     @php
-        $roomSelected = old('room_id');
+        $roomSelected = request()->query('room') ?? old('room_id');
 
     @endphp
 
