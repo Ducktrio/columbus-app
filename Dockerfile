@@ -46,7 +46,6 @@ WORKDIR /var/www
 
 COPY . .
 
-COPY .env.prod .env.prod
 
 COPY --from=nodebuilder /app/public/build /var/www/public/build
 
@@ -59,7 +58,15 @@ RUN chown -R www-data:www-data /var/www \
 
 RUN php artisan config:cache \
  && php artisan route:cache \
- && php artisan view:cache
+ && php artisan view:cache \
+ && php artisan key:generate
+
+RUN php artisan migrate --force --seed
+
+RUN chmod -R 664 /var/www/database/database.sqlite
+
+RUN chown -R www-data:www-data /var/www/database/database.sqlite
+
 
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
