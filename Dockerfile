@@ -38,6 +38,14 @@ RUN apt-get update && apt-get install -y \
         gd \
         opcache
 
+# Start and enable SSH
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends dialog \
+    && apt-get install -y --no-install-recommends openssh-server \
+    && echo "root:Docker!" | chpasswd \
+COPY sshd_config /etc/ssh/
+
+EXPOSE 2222
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -61,23 +69,14 @@ RUN php artisan config:cache \
  && php artisan route:cache \
  && php artisan view:cache
 
-# Ensuring database folderpath before migrations
-RUN mkdir -p /storage/database \
- && chown -R www-data:www-data /storage \
- && chmod -R 755 /storage
 
 RUN php artisan migrate --force --seed
 
 RUN php artisan key:generate
 
-RUN chmod -R 755 /storage/database
+RUN chmod 664 /var/www/database/database.sqlite
 
-RUN chown -R www-data:www-data /storage/database
-
-RUN chmod -R 664 /storage/database/database.sqlite
-
-RUN chown -R www-data:www-data /storage/database/database.sqlite
-
+RUN chown -R www-data:www-data /var/www/database/database.sqlite
 
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
