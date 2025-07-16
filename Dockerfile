@@ -68,6 +68,8 @@ RUN mkdir -p /storage/database \
 
 RUN php artisan migrate --force --seed
 
+RUN php artisan key:generate
+
 RUN chmod -R 755 /storage/database
 
 RUN chown -R www-data:www-data /storage/database
