@@ -114,6 +114,12 @@ class DatabaseSeeder extends Seeder
             'status' => '0',
         ]);
 
+        Customer::create([
+            'courtesy_title' => 'Service',
+            'full_name' => 'Ticket',
+            'age' => 1000
+        ]);
+
      
        
     }
