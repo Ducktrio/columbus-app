@@ -46,6 +46,7 @@ WORKDIR /var/www
 
 COPY . .
 
+COPY .env.prod .env
 
 COPY --from=nodebuilder /app/public/build /var/www/public/build
 
@@ -60,11 +61,20 @@ RUN php artisan config:cache \
  && php artisan route:cache \
  && php artisan view:cache
 
+# Ensuring database folderpath before migrations
+RUN mkdir -p /storage/database \
+ && chown -R www-data:www-data /storage \
+ && chmod -R 755 /storage
+
 RUN php artisan migrate --force --seed
 
-RUN chmod -R 664 /var/www/database/database.sqlite
+RUN chmod -R 755 /storage/database
 
-RUN chown -R www-data:www-data /var/www/database/database.sqlite
+RUN chown -R www-data:www-data /storage/database
+
+RUN chmod -R 664 /storage/database/database.sqlite
+
+RUN chown -R www-data:www-data /storage/database/database.sqlite
 
 
 
