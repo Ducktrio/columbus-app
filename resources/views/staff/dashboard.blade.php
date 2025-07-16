@@ -10,16 +10,27 @@
 
             <li class="nav-item">
                 <a class="nav-link {{ request('status') === '0' ? 'active' : '' }}"
-                    href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '0'])) }}">Open</a>
+                    href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '0'])) }}">Open
+                    @if (\App\Models\Service::find(request()->query('service_id'))->serviceTickets->where('status', 0)->count() > 0)
+                        <span class="badge text-bg-danger">{{ \App\Models\Service::find(request()->query('service_id'))->serviceTickets->where('status', 0)->count() }}
+                    @endif
+                </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request('status') === '1' ? 'active' : '' }}"
                     href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '1'])) }}">In
-                    Progress</a>
+                    Progress
+
+                    @if (\App\Models\Service::find(request()->query('service_id'))->serviceTickets->where('status', 1)->count() > 0)
+
+                    <span class="badge text-bg-secondary">{{ \App\Models\Service::find(request()->query('service_id'))->serviceTickets->where('status', 1)->count() }}
+                    @endif
+                </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request('status') === '2' ? 'active' : '' }}"
-                    href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '2'])) }}">Resolved</a>
+                    href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['status' => '2'])) }}">Resolved
+                </a>
             </li>
         </ul>
     </div>
