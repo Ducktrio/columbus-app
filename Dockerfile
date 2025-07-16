@@ -54,7 +54,7 @@ WORKDIR /var/www
 
 COPY . .
 
-COPY .env.prod .env
+COPY .env.production .env
 
 COPY --from=nodebuilder /app/public/build /var/www/public/build
 

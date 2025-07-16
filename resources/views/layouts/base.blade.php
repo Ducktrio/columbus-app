@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Columbus')</title>
+    <title>@yield('title', config('app.name'))</title>
     @vite('resources/css/app.css')
 </head>
 <body>

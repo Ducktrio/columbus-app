@@ -9,7 +9,7 @@
         <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary vh-100 position-sticky top-0 left-0"
             style="width: 280px;">
             <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none">
-                <span class="fs-4">Columbus</span>
+                <span class="fs-4">{{config('app.name')}}</span>
             </a>
             <small class="fst-italic">Manager Panel</small>
             <hr>

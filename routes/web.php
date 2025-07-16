@@ -505,7 +505,7 @@ Route::prefix('reception')->group(function () {
 Route::prefix('staff')->group(function () {
 
     Route::get('/', function () {
-        return redirect()->route('staff.dashboard');
+        return redirect()->route('staff.dashboard', ['status' => '0', 'service_id' => Service::query()->first()->id]);
     })->name('staff');       // staff
 
 
@@ -515,6 +515,7 @@ Route::prefix('staff')->group(function () {
         $service_id = $request->query('service_id');
         $status = $request->query('status');
 
+
         $tickets = ServiceTicket::query();
 
         if ($service_id) {
@@ -523,8 +524,10 @@ Route::prefix('staff')->group(function () {
 
         if (isset($status)) {
             $tickets->where('status', $status);
-        } else {
-            return redirect()->route('staff.dashboard', array_merge($request->query(), ['status' => '0']));
+        }
+        
+        if(!isset($status) || !isset($service_id)) {
+            return redirect()->route('staff.dashboard', array_merge($request->query(), ['status' => '0', 'service_id' => Service::query()->first()->id]));
         }
 
         $tickets = $tickets->orderBy('status')->orderByDesc('created_at')->paginate(6);
