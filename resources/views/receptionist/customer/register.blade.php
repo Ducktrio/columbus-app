@@ -15,7 +15,6 @@
      * - courtesy_title: Required, string, maximum 255 characters.<br>
      * - full_name: Required, string, maximum 255 characters.<br>
      * - age: Required, numeric, must be at least 18 years old.<br>
-     * - contact_info: Optional, string, maximum 255 characters.<br>
      * - phone_number: Optional, string, maximum 20 characters.<br>
      *
      * Please ensure all required fields are filled and age is 18 or older.
